@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Preview Hasil Akhir - Detektif Cerita</title>
+  <link rel="stylesheet" href="detektif_style.css?v=20261013_v5">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0d1522;
+      margin: 0;
+      padding: 20px;
+      font-family: 'Outfit', sans-serif;
+    }
+    .preview-header {
+      color: #f5b041;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .test-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .test-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1.5px solid #f5b041;
+      background: rgba(30, 48, 80, 0.8);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .test-btn:hover {
+      background: #f5b041;
+      color: #000;
+    }
+    #stage-wrapper {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      max-width: 95vw;
+      max-height: calc(95vw * 9 / 16);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #stage-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      display: block;
+    }
+    #c2canvasdiv {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: visible;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage-wrapper">
+    <img id="stage-bg" src="images/bg_feedbackakhir-sheet0.png" alt="Background Feedback Akhir">
+    <div id="c2canvasdiv"></div>
+  </div>
+
+  <!-- Detective Engine -->
+  <script src="detektif_engine.js?v=20261013_v5"></script>
+  <script>
+    function testScenario(name, secs) {
+      DetectiveEngine.playerName = name;
+      DetectiveEngine.elapsedSeconds = secs;
+      DetectiveEngine.finishGame();
+    }
+
+    function testAlert() {
+      try {
+        DetectiveEngine.triggerMissionWarning('misi 3', 0, 9);
+        var m = document.getElementById('game-alert-modal');
+        document.getElementById('debug-log').textContent = 'Status: Modal alert triggered! Modal class: ' + (m ? m.className : 'null');
+      } catch (e) {
+        document.getElementById('debug-log').textContent = 'Error: ' + e.message;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        if (window.location.search.indexOf('show=alert') !== -1) {
+          testAlert();
+        } else {
+          testScenario('Lala', 515); // Default: 08:35 (< 10 Menit -> Sangat Cepat, Superior)
+        }
+      }, 300);
+    });
+  </script>
+</body>
+</html>
