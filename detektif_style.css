@@ -91,7 +91,6 @@ html, body {
 }
 
 /* ==========================================================================
-/* ==========================================================================
    THEMATIC WOODEN HUD (RESPONSIVE & PROPORTIONAL ON ALL SCREENS)
    ========================================================================== */
 /* Bottom Left Corner: Player Badge */
@@ -555,6 +554,8 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
   #c2canvasdiv.hud-landscape .hud-fs-icon,
   body.hud-landscape #c2canvasdiv .hud-fs-icon {
+    font-size: 12px !important;
+  }
 }
 
 /* 4. EXTRA SMALL PHONES (width <= 360px portrait) */
