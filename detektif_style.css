@@ -91,7 +91,8 @@ html, body {
 }
 
 /* ==========================================================================
-   THEMATIC WOODEN HUD (MATCHES GAME MENU & BUTTON ART STYLE)
+/* ==========================================================================
+   THEMATIC WOODEN HUD (RESPONSIVE & PROPORTIONAL ON ALL SCREENS)
    ========================================================================== */
 /* Bottom Left Corner: Player Badge */
 .game-hud-player {
@@ -123,7 +124,7 @@ html, body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Wooden Badge for Player Name */
+/* Wooden Badge for Player Name (Desktop base) */
 .hud-wood-badge {
   display: inline-flex;
   align-items: center;
@@ -139,6 +140,7 @@ html, body {
     inset 0 -2px 2px rgba(0, 0, 0, 0.3);
   font-family: var(--font-game);
   user-select: none;
+  transition: all 0.25s var(--ease-spring);
 }
 
 .hud-badge-avatar {
@@ -153,6 +155,7 @@ html, body {
   font-size: 17px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
   flex-shrink: 0;
+  transition: all 0.25s ease;
 }
 
 .hud-badge-info {
@@ -167,6 +170,7 @@ html, body {
   color: #fed7aa;
   letter-spacing: 0.8px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  transition: font-size 0.25s ease;
 }
 
 .hud-badge-name {
@@ -179,9 +183,10 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: all 0.25s ease;
 }
 
-/* Wooden Buttons for Actions */
+/* Wooden Buttons for Actions (Desktop base) */
 .hud-wood-btn {
   display: inline-flex;
   align-items: center;
@@ -234,11 +239,13 @@ html, body {
   font-size: 16px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
+  transition: all 0.25s ease;
 }
 
 .hud-btn-text {
   font-family: var(--font-game);
   letter-spacing: 0.5px;
+  transition: font-size 0.25s ease;
 }
 
 .hud-btn-fs {
@@ -246,10 +253,324 @@ html, body {
   height: 38px;
   padding: 0;
   border-radius: 50%;
+  transition: all 0.25s ease;
 }
 
 .hud-fs-icon {
   font-size: 16px;
+  transition: font-size 0.25s ease;
+}
+
+/* ==========================================================================
+   RESPONSIVE HUD ADAPTATIONS (MOBILE HP & TABLETS)
+   ========================================================================== */
+
+/* 1. TABLET / MEDIUM SCREENS (width <= 1024px) */
+@media (max-width: 1024px) {
+  .game-hud-player {
+    bottom: 12px;
+    left: 14px;
+  }
+  .game-hud-actions {
+    bottom: 12px;
+    right: 14px;
+    gap: 7px;
+  }
+  .hud-wood-badge {
+    gap: 8px;
+    padding: 5px 13px 5px 7px;
+    border-width: 2.5px;
+  }
+  .hud-badge-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+  .hud-badge-label {
+    font-size: 10px;
+  }
+  .hud-badge-name {
+    font-size: 14px;
+    max-width: 110px;
+  }
+  .hud-wood-btn {
+    gap: 7px;
+    padding: 5px 13px 5px 7px;
+    border-width: 2.5px;
+    font-size: 13.5px;
+  }
+  .hud-icon-bubble {
+    width: 27px;
+    height: 27px;
+    font-size: 14px;
+  }
+  .hud-btn-fs {
+    width: 35px;
+    height: 35px;
+  }
+  .hud-fs-icon {
+    font-size: 15px;
+  }
+}
+
+/* ==========================================================================
+   PORTRAIT / VERTICAL LETTERBOX MODE (ALWAYS ACTIVE WHEN CANVAS HAS LETTERBOX)
+   KUNCI UTAMA:
+   Pada layar HP vertikal atau layar dengan letterbox vertikal, canvas game hanya
+   berukuran ~200px di tengah layar. Tombol dipindahkan ke RUANG KOSONG DI BAWAH
+   CANVAS (top: calc(100% + 12px)) sehingga 100% TIDAK PERNAH MENUTUPI / MEMBLOCK
+   elemen game di dalam board, teka-teki, maupun bidak kartu drop-zone.
+   ========================================================================== */
+
+/* 1. Explicit JS-managed Portrait & Letterbox classes (Maximum Specificity) */
+#c2canvasdiv.hud-portrait .game-hud-player,
+body.hud-portrait #c2canvasdiv .game-hud-player {
+  bottom: auto !important;
+  top: calc(100% + 12px) !important;
+  left: 8px !important;
+}
+
+#c2canvasdiv.hud-portrait .game-hud-actions,
+body.hud-portrait #c2canvasdiv .game-hud-actions {
+  bottom: auto !important;
+  top: calc(100% + 12px) !important;
+  right: 8px !important;
+  gap: 6px !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-wood-badge,
+body.hud-portrait #c2canvasdiv .hud-wood-badge {
+  gap: 6px !important;
+  padding: 4px 10px 4px 6px !important;
+  border-width: 2px !important;
+  box-shadow: 
+    0 3px 0 #331504,
+    0 5px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-badge-avatar,
+body.hud-portrait #c2canvasdiv .hud-badge-avatar {
+  width: 25px !important;
+  height: 25px !important;
+  font-size: 13px !important;
+  border-width: 1.5px !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-badge-label,
+body.hud-portrait #c2canvasdiv .hud-badge-label {
+  font-size: 8px !important;
+  letter-spacing: 0.5px !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-badge-name,
+body.hud-portrait #c2canvasdiv .hud-badge-name {
+  font-size: 12px !important;
+  max-width: 85px !important;
+  letter-spacing: 0.3px !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-wood-btn,
+body.hud-portrait #c2canvasdiv .hud-wood-btn {
+  gap: 6px !important;
+  padding: 4px 10px 4px 6px !important;
+  border-width: 2px !important;
+  font-size: 12px !important;
+  box-shadow: 
+    0 3px 0 #331504,
+    0 5px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-icon-bubble,
+body.hud-portrait #c2canvasdiv .hud-icon-bubble {
+  width: 25px !important;
+  height: 25px !important;
+  font-size: 13px !important;
+  border-width: 1.5px !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-btn-fs,
+body.hud-portrait #c2canvasdiv .hud-btn-fs {
+  width: 33px !important;
+  height: 33px !important;
+  border-width: 2px !important;
+}
+
+#c2canvasdiv.hud-portrait .hud-fs-icon,
+body.hud-portrait #c2canvasdiv .hud-fs-icon {
+  font-size: 13px !important;
+}
+
+/* 2. Pure CSS Media Queries for Portrait (Fallback & Immediate Render) */
+@media (orientation: portrait), (max-aspect-ratio: 1/1), (max-width: 600px) and (max-aspect-ratio: 4/3) {
+  .game-hud-player {
+    bottom: auto !important;
+    top: calc(100% + 12px) !important;
+    left: 8px !important;
+  }
+
+  .game-hud-actions {
+    bottom: auto !important;
+    top: calc(100% + 12px) !important;
+    right: 8px !important;
+    gap: 6px !important;
+  }
+
+  .hud-wood-badge {
+    gap: 6px !important;
+    padding: 4px 10px 4px 6px !important;
+    border-width: 2px !important;
+    box-shadow: 
+      0 3px 0 #331504,
+      0 5px 12px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  }
+
+  .hud-badge-avatar {
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 13px !important;
+    border-width: 1.5px !important;
+  }
+
+  .hud-badge-label {
+    font-size: 8px !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .hud-badge-name {
+    font-size: 12px !important;
+    max-width: 85px !important;
+    letter-spacing: 0.3px !important;
+  }
+
+  .hud-wood-btn {
+    gap: 6px !important;
+    padding: 4px 10px 4px 6px !important;
+    border-width: 2px !important;
+    font-size: 12px !important;
+    box-shadow: 
+      0 3px 0 #331504,
+      0 5px 12px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  }
+
+  .hud-icon-bubble {
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 13px !important;
+    border-width: 1.5px !important;
+  }
+
+  .hud-btn-fs {
+    width: 33px !important;
+    height: 33px !important;
+    border-width: 2px !important;
+  }
+
+  .hud-fs-icon {
+    font-size: 13px !important;
+  }
+}
+
+/* 3. MOBILE LANDSCAPE (HP MODE MIRING / LAYAR PENUH)
+   Saat HP dimiringkan horizontal, canvas memenuhi layar.
+   Tombol tetap di dalam sudut canvas, tetapi dengan ukuran kompak & proporsional.
+*/
+@media (orientation: landscape) and (max-height: 560px),
+       (orientation: landscape) and (max-width: 860px) {
+  #c2canvasdiv.hud-landscape .game-hud-player,
+  body.hud-landscape #c2canvasdiv .game-hud-player {
+    bottom: 8px !important;
+    top: auto !important;
+    left: 10px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .game-hud-actions,
+  body.hud-landscape #c2canvasdiv .game-hud-actions {
+    bottom: 8px !important;
+    top: auto !important;
+    right: 10px !important;
+    gap: 5px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-wood-badge,
+  body.hud-landscape #c2canvasdiv .hud-wood-badge {
+    gap: 5px !important;
+    padding: 3px 9px 3px 5px !important;
+    border-width: 2px !important;
+    box-shadow: 
+      0 2px 0 #331504,
+      0 4px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-badge-avatar,
+  body.hud-landscape #c2canvasdiv .hud-badge-avatar {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+    border-width: 1.5px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-badge-label,
+  body.hud-landscape #c2canvasdiv .hud-badge-label {
+    font-size: 8px !important;
+    letter-spacing: 0.4px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-badge-name,
+  body.hud-landscape #c2canvasdiv .hud-badge-name {
+    font-size: 11px !important;
+    max-width: 75px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-wood-btn,
+  body.hud-landscape #c2canvasdiv .hud-wood-btn {
+    gap: 5px !important;
+    padding: 3px 9px 3px 5px !important;
+    border-width: 2px !important;
+    font-size: 11px !important;
+    box-shadow: 
+      0 2px 0 #331504,
+      0 4px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-icon-bubble,
+  body.hud-landscape #c2canvasdiv .hud-icon-bubble {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+    border-width: 1.5px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-btn-fs,
+  body.hud-landscape #c2canvasdiv .hud-btn-fs {
+    width: 28px !important;
+    height: 28px !important;
+    border-width: 2px !important;
+  }
+
+  #c2canvasdiv.hud-landscape .hud-fs-icon,
+  body.hud-landscape #c2canvasdiv .hud-fs-icon {
+}
+
+/* 4. EXTRA SMALL PHONES (width <= 360px portrait) */
+@media (orientation: portrait) and (max-width: 360px) {
+  .hud-badge-name {
+    max-width: 65px !important;
+    font-size: 11px !important;
+  }
+  .hud-wood-btn {
+    font-size: 11px !important;
+    padding: 3px 8px 3px 4px !important;
+  }
+  .hud-btn-fs {
+    width: 29px !important;
+    height: 29px !important;
+  }
 }
 
 /* ==========================================================================
@@ -965,10 +1286,165 @@ html, body {
   color: #94a3b8;
 }
 
-.empty-state-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  opacity: 0.7;
+/* ==========================================================================
+   MOBILE RESPONSIVENESS FOR HASIL AKHIR & MODALS
+   ========================================================================== */
+@media (max-width: 650px), (orientation: portrait) {
+  /* Hasil Akhir Overlay */
+  .title-prefix {
+    font-size: clamp(10px, 2.3vw, 24px) !important;
+  }
+  .title-name {
+    font-size: clamp(15px, 4.2vw, 38px) !important;
+  }
+  .result-card-label {
+    font-size: clamp(9px, 1.8vw, 15px) !important;
+  }
+  .result-time-num {
+    font-size: clamp(15px, 3.2vw, 30px) !important;
+  }
+  .result-category-text {
+    font-size: clamp(11px, 2.3vw, 22px) !important;
+  }
+  .result-predicate-text {
+    font-size: clamp(10px, 2.1vw, 20px) !important;
+  }
+  .result-wood-actions {
+    top: 86.5% !important;
+    left: 50% !important;
+    gap: 4px !important;
+    width: 96% !important;
+    max-width: 380px !important;
+    justify-content: center !important;
+  }
+  .wood-action-btn {
+    padding: 3px 7px 3px 4px !important;
+    font-size: 10px !important;
+    gap: 4px !important;
+    border-width: 2px !important;
+    box-shadow: 0 2px 0 #331504, 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+  .wood-icon-bubble {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 11px !important;
+    border-width: 1.5px !important;
+  }
+  .wood-text {
+    letter-spacing: 0.2px !important;
+  }
+
+  /* Game Alert Modal */
+  .game-alert-modal-card {
+    padding: 24px 16px 20px !important;
+    border-radius: 20px !important;
+    border-width: 3.5px !important;
+    max-width: 92vw !important;
+  }
+  .alert-modal-badge {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 26px !important;
+    border-width: 3px !important;
+  }
+  .alert-modal-badge-wrapper {
+    margin-top: -46px !important;
+  }
+  .alert-modal-title {
+    font-size: 19px !important;
+  }
+  .alert-modal-content {
+    font-size: 13.5px !important;
+    margin-bottom: 16px !important;
+  }
+  .alert-highlight {
+    font-size: 14.5px !important;
+    padding: 8px 10px !important;
+  }
+  .alert-hint {
+    font-size: 12.5px !important;
+  }
+
+  /* Leaderboard & Certificate Modal */
+  .detective-modal-backdrop {
+    padding: 10px 8px !important;
+  }
+  .detective-modal-card {
+    border-radius: 18px !important;
+    border-width: 2.5px !important;
+    max-height: 94vh !important;
+  }
+  .modal-header {
+    padding: 12px 14px !important;
+  }
+  .modal-title {
+    font-size: 17px !important;
+    gap: 8px !important;
+  }
+  .modal-body {
+    padding: 12px 10px !important;
+  }
+  .leaderboard-item {
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+  .lb-rank {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+  }
+  .lb-name {
+    font-size: 13.5px !important;
+    max-width: 105px !important;
+  }
+  .lb-meta {
+    font-size: 10px !important;
+  }
+  .lb-time {
+    font-size: 15px !important;
+  }
+  .lb-badge {
+    font-size: 10px !important;
+    padding: 3px 7px !important;
+  }
+
+  /* Certificate on Mobile */
+  .cert-card {
+    padding: 14px 10px !important;
+    border-width: 6px !important;
+  }
+  .cert-title {
+    font-size: 18px !important;
+  }
+  .cert-sub {
+    font-size: 11px !important;
+    margin: 2px 0 8px !important;
+  }
+  .cert-name {
+    font-size: 22px !important;
+    margin: 6px 0 10px !important;
+  }
+  .cert-stats-grid {
+    gap: 6px !important;
+    margin: 12px 0 !important;
+  }
+  .cert-stat-box {
+    padding: 6px 4px !important;
+  }
+  .cert-stat-lbl {
+    font-size: 9px !important;
+  }
+  .cert-stat-val {
+    font-size: 13px !important;
+  }
+  .cert-footer {
+    margin-top: 14px !important;
+    padding-top: 8px !important;
+    font-size: 10px !important;
+  }
+  .cert-seal {
+    font-size: 28px !important;
+  }
 }
 
 /* Print specific rules for Certificate */

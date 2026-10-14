@@ -61,6 +61,7 @@
     init: function () {
       this.loadHistory();
       this.injectHUD();
+      this.setupResponsiveHUD();
       this.injectGameAlertModal();
       this.injectModals();
       this.initAmbientParticles();
@@ -351,8 +352,18 @@
         // Callback setelah layout berubah
         setTimeout(function () {
           self.onLayoutChanged(toLayout);
+          if (self.updateHUDLayout) self.updateHUDLayout();
         }, 50);
       };
+
+      // Hook C2 setSize to keep HUD perfectly responsive when window/viewport resizes
+      var origSetSize = proto.setSize;
+      if (origSetSize) {
+        proto.setSize = function (w, h, force) {
+          origSetSize.apply(this, arguments);
+          if (self.updateHUDLayout) self.updateHUDLayout();
+        };
+      }
 
       // Hook C2 Text plugin to NEVER draw native Text instances on 'hasil akhir' layout
       try {
@@ -411,6 +422,7 @@
     onLayoutChanged: function (layoutName) {
       this.currentLayoutName = layoutName;
       this.removeHasilAkhirOverlay();
+      if (this.updateHUDLayout) this.updateHUDLayout();
 
       var playerHud = document.getElementById('game-hud-player');
       var actionsHud = document.getElementById('game-hud-actions');
@@ -914,6 +926,52 @@
       } else {
         if (document.exitFullscreen) document.exitFullscreen();
       }
+    },
+
+    // Dynamic Responsive Layout Manager for Mobile Screens & Orientation
+    setupResponsiveHUD: function () {
+      var self = this;
+      this.updateHUDLayout = function () {
+        var isPortrait = window.innerHeight >= window.innerWidth;
+        var canvas = document.getElementById('c2canvas');
+        var canvasDiv = document.getElementById('c2canvasdiv');
+        var w = canvas ? canvas.offsetWidth : window.innerWidth;
+        var h = canvas ? canvas.offsetHeight : window.innerHeight;
+        var ratio = window.innerWidth / (window.innerHeight || 1);
+
+        // Portrait or vertically letterboxed screen (ratio <= 1.35)
+        var isLetterboxPortrait = isPortrait || (ratio <= 1.35);
+
+        var targetElements = [canvasDiv, document.body];
+        targetElements.forEach(function (el) {
+          if (!el) return;
+          if (isLetterboxPortrait) {
+            el.classList.add('hud-portrait');
+            el.classList.remove('hud-landscape');
+          } else {
+            el.classList.add('hud-landscape');
+            el.classList.remove('hud-portrait');
+          }
+          if (w <= 860 || window.innerWidth <= 860) {
+            el.classList.add('hud-mobile');
+          } else {
+            el.classList.remove('hud-mobile');
+          }
+        });
+      };
+
+      window.addEventListener('resize', this.updateHUDLayout, { passive: true });
+      window.addEventListener('orientationchange', function () {
+        setTimeout(self.updateHUDLayout, 100);
+        setTimeout(self.updateHUDLayout, 300);
+      });
+      document.addEventListener('fullscreenchange', function () {
+        setTimeout(self.updateHUDLayout, 100);
+      });
+
+      this.updateHUDLayout();
+      setTimeout(this.updateHUDLayout, 100);
+      setTimeout(this.updateHUDLayout, 400);
     },
 
     // =========================================================================
