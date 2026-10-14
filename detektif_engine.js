@@ -389,6 +389,80 @@
         }
       } catch (e) {}
 
+      // Hook C2 TextBox plugin to prevent C2 from overriding responsive font sizes with giant em values
+      try {
+        if (window.cr && window.cr.plugins_ && window.cr.plugins_.TextBox) {
+          var tbProto = window.cr.plugins_.TextBox.prototype.Instance.prototype;
+          if (tbProto && !tbProto._detektifHooked) {
+            tbProto._detektifHooked = true;
+            var origUpdatePosition = tbProto.updatePosition;
+            tbProto.updatePosition = function () {
+              this.autoFontSize = false;
+              origUpdatePosition.apply(this, arguments);
+            };
+          }
+        }
+      } catch (e) {}
+
+      // Hook C2 Touch & Mouse plugins to intercept tapping 'Next' / 'Selanjutnya' button in missions
+      try {
+        var checkAndWarn = function (type) {
+          if (!self.currentLayoutName) return;
+          if (self.currentLayoutName.indexOf('misi ') !== 0) return;
+
+          var config = self.missionTargets[self.currentLayoutName];
+          if (!config) return;
+          if (self.completedMissions[self.currentLayoutName]) return;
+
+          var isNextBtn = false;
+          if (type && type.name) {
+            if (type.name === 't19' || type.name === 't119') isNextBtn = true;
+          }
+          if (!isNextBtn && type && type.animations && type.animations[0]) {
+            var frames = type.animations[0].frames;
+            if (frames && frames[0] && frames[0].texture_file) {
+              var tex = frames[0].texture_file.toLowerCase();
+              if (tex.indexOf('button_next') !== -1 || tex.indexOf('button_selanjutnya') !== -1) {
+                isNextBtn = true;
+              }
+            }
+          }
+
+          if (isNextBtn) {
+            var currentVal = self.getC2Var(config.varName) || 0;
+            if (currentVal < config.target) {
+              self.triggerMissionWarning(self.currentLayoutName, currentVal, config.target);
+            }
+          }
+        };
+
+        if (window.cr && window.cr.plugins_ && window.cr.plugins_.Touch) {
+          var touchCnds = window.cr.plugins_.Touch.prototype.cnds;
+          if (touchCnds && !touchCnds._detektifHooked) {
+            touchCnds._detektifHooked = true;
+            var origOnTouchObject = touchCnds.OnTouchObject;
+            touchCnds.OnTouchObject = function (type) {
+              var res = origOnTouchObject.apply(this, arguments);
+              if (res) checkAndWarn(type);
+              return res;
+            };
+          }
+        }
+
+        if (window.cr && window.cr.plugins_ && window.cr.plugins_.Mouse) {
+          var mouseCnds = window.cr.plugins_.Mouse.prototype.cnds;
+          if (mouseCnds && !mouseCnds._detektifHooked) {
+            mouseCnds._detektifHooked = true;
+            var origOnObjectClicked = mouseCnds.OnObjectClicked;
+            mouseCnds.OnObjectClicked = function (mousebutton, clicktype, type) {
+              var res = origOnObjectClicked.apply(this, arguments);
+              if (res) checkAndWarn(type);
+              return res;
+            };
+          }
+        }
+      } catch (e) {}
+
       console.log('🔒 Construct 2 Lifecycle & Layout Guards Active');
     },
 
@@ -500,14 +574,48 @@
     // Name Input Enhancement
     enhanceNameInput: function () {
       var self = this;
-      setTimeout(function () {
+      var attempts = 0;
+      var interval = setInterval(function () {
+        attempts++;
         var input = document.querySelector('#c2canvasdiv input, input[type="text"], input');
         if (input) {
+          clearInterval(interval);
+
+          // Disable C2 TextBox automatic font size recalculation which blows up font size on mobile
+          try {
+            var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+            if (rt && rt.types_by_index) {
+              for (var i = 0; i < rt.types_by_index.length; i++) {
+                var t = rt.types_by_index[i];
+                if (t && t.plugin && (t.plugin.id === 5 || t.name === 't195')) {
+                  if (t.instances) {
+                    for (var j = 0; j < t.instances.length; j++) {
+                      t.instances[j].autoFontSize = false;
+                    }
+                  }
+                }
+              }
+            }
+          } catch (e) {}
+
+          var isMobile = (window.innerWidth <= 600) || (window.innerHeight > window.innerWidth);
           input.value = '';
-          input.setAttribute('placeholder', 'Ketik nama detektif...');
+          input.setAttribute('placeholder', isMobile ? 'Ketik nama...' : 'Ketik nama detektif...');
           input.setAttribute('maxlength', '20');
           input.setAttribute('autocomplete', 'off');
           input.setAttribute('spellcheck', 'false');
+          input.classList.add('c2-input-name');
+
+          // Force proper font size and padding inline with !important priority
+          if (isMobile) {
+            input.style.setProperty('font-size', '12px', 'important');
+            input.style.setProperty('padding', '2px 4px', 'important');
+            input.style.setProperty('line-height', 'normal', 'important');
+          } else {
+            input.style.setProperty('font-size', '16px', 'important');
+            input.style.setProperty('padding', '4px 8px', 'important');
+          }
+
           input.focus();
 
           input.oninput = function () {
@@ -532,41 +640,66 @@
             }
           };
         }
-      }, 100);
+        if (attempts > 30) clearInterval(interval);
+      }, 50);
     },
 
-    // Canvas click interception for guidance on 'Next' button
+    // Canvas click & touch interception for guidance on 'Next' button
     setupCanvasInteractions: function () {
       var self = this;
       var canvas = document.getElementById('c2canvas');
       if (!canvas) return;
 
-      canvas.addEventListener('click', function (e) {
+      var lastTriggerTime = 0;
+
+      function checkInteraction(e) {
         if (!self.currentLayoutName) return;
+        if (self.currentLayoutName.indexOf('misi ') !== 0) return;
 
-        // Check if on a puzzle mission layout (misi 1 - 6)
-        if (self.currentLayoutName.indexOf('misi ') === 0) {
-          var config = self.missionTargets[self.currentLayoutName];
-          if (!config) return;
+        var config = self.missionTargets[self.currentLayoutName];
+        if (!config) return;
+        if (self.completedMissions[self.currentLayoutName]) return;
 
-          // If this mission was already completed, don't interfere
-          if (self.completedMissions[self.currentLayoutName]) return;
+        var touch = (e.changedTouches && e.changedTouches.length > 0)
+          ? e.changedTouches[0]
+          : ((e.touches && e.touches.length > 0) ? e.touches[0] : e);
 
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width;
-          var scaleY = canvas.height / rect.height;
-          var canvasX = (e.clientX - rect.left) * scaleX;
-          var canvasY = (e.clientY - rect.top) * scaleY;
+        var clientX = touch.clientX;
+        var clientY = touch.clientY;
+        if (clientX === undefined || clientY === undefined) return;
 
-          // In missions 1-6, 'button_next' is located around (1622, 67), width: 205, height: 117
-          if (canvasX >= 1500 && canvasX <= 1720 && canvasY >= 0 && canvasY <= 140) {
-            var currentVal = self.getC2Var(config.varName) || 0;
-            if (currentVal < config.target) {
-              self.triggerMissionWarning(self.currentLayoutName, currentVal, config.target);
-            }
+        var rect = canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+
+        // Translate client tap/click to Construct 2's native 1708 x 960 layout coordinates
+        var layoutX = (clientX - rect.left) * (1708 / rect.width);
+        var layoutY = (clientY - rect.top) * (960 / rect.height);
+
+        var isHit = false;
+        // In missions 1-6, 'button_next' is located around (1622, 67), width: 205, height: 117
+        if (layoutX >= 1480 && layoutX <= 1730 && layoutY >= 0 && layoutY <= 150) {
+          isHit = true;
+        }
+        // In missions 7-10, 'button_selanjutnya' is located around (1500, 897), width: 326, height: 67
+        else if (layoutX >= 1300 && layoutX <= 1700 && layoutY >= 840 && layoutY <= 960) {
+          isHit = true;
+        }
+
+        if (isHit) {
+          var now = Date.now();
+          if (now - lastTriggerTime < 600) return;
+          var currentVal = self.getC2Var(config.varName) || 0;
+          if (currentVal < config.target) {
+            lastTriggerTime = now;
+            self.triggerMissionWarning(self.currentLayoutName, currentVal, config.target);
           }
         }
-      }, true);
+      }
+
+      // Listen on capture phase to ensure mobile touch and mouse events are intercepted
+      canvas.addEventListener('touchend', checkInteraction, { capture: true, passive: true });
+      canvas.addEventListener('pointerup', checkInteraction, { capture: true, passive: true });
+      canvas.addEventListener('click', checkInteraction, true);
     },
 
     // Prominent Game Modal Alert System (bagus & kelihatan)
@@ -596,14 +729,25 @@
       document.body.appendChild(modal);
 
       var self = this;
-      var closeFunc = function () {
+      var closeFunc = function (e) {
+        if (e && e.type === 'touchend') e.preventDefault();
         self.playSound('click');
         self.closeGameAlert();
       };
-      document.getElementById('btn-close-alert').onclick = closeFunc;
-      document.getElementById('btn-ok-alert').onclick = closeFunc;
+
+      var btnClose = document.getElementById('btn-close-alert');
+      var btnOk = document.getElementById('btn-ok-alert');
+      if (btnClose) {
+        btnClose.onclick = closeFunc;
+        btnClose.addEventListener('touchend', closeFunc, { passive: false });
+      }
+      if (btnOk) {
+        btnOk.onclick = closeFunc;
+        btnOk.addEventListener('touchend', closeFunc, { passive: false });
+      }
+
       modal.onclick = function (e) {
-        if (e.target === modal) closeFunc();
+        if (e.target === modal) closeFunc(e);
       };
 
       document.addEventListener('keydown', function (e) {
