@@ -118,6 +118,24 @@ html, body {
   animation: fadeInUp 0.4s var(--ease-spring) both;
 }
 
+/* Shift Papan Skor & Fullscreen to the left on missions 7-10 so it never overlaps 'Selanjutnya' */
+.game-hud-actions.hud-shift-misi-alur {
+  right: clamp(340px, 23.5%, 440px) !important;
+  bottom: 16px !important;
+}
+
+/* On gameplay missions, scoreboard button is completely hidden as per user request */
+.game-hud-actions.hud-no-scoreboard #hud-btn-lb {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .game-hud-actions.hud-shift-misi-alur {
+    right: clamp(260px, 24%, 330px) !important;
+    bottom: 12px !important;
+  }
+}
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
@@ -576,76 +594,79 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 /* ==========================================================================
    NAME INPUT ENHANCEMENT & GATING
+   Seamless integration inside the pre-drawn parchment capsule (no awkward box!)
    ========================================================================== */
 #c2canvasdiv input[type="text"],
 #c2canvasdiv input {
   box-sizing: border-box !important;
-  transition: all 0.3s var(--ease-spring) !important;
-  text-align: center !important;
-  font-family: var(--font-main) !important;
-  font-weight: 700 !important;
-  font-size: clamp(14px, 1.8vw, 22px) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-align: left !important;
+  font-family: var(--font-game), 'Fredoka', 'Nunito', cursive, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: clamp(20px, 2.7vw, 40px) !important;
   line-height: normal !important;
-  padding: 4px 8px !important;
-  border-radius: 8px !important;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15) !important;
-  letter-spacing: 0.5px !important;
+  padding: 4px 18px 4px clamp(14px, 1.8vw, 24px) !important;
+  border-radius: 999px !important;
+  letter-spacing: 1.5px !important;
+  color: #3b1d08 !important;
+  caret-color: #8b5a2b !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+  transition: color 0.2s ease, text-shadow 0.2s ease !important;
 }
 
 #c2canvasdiv input::placeholder {
-  color: #7f8c8d !important;
-  opacity: 0.75 !important;
-  font-size: 0.9em !important;
-  font-weight: 500 !important;
+  color: rgba(120, 65, 25, 0.45) !important;
+  font-family: var(--font-game), 'Fredoka', 'Nunito', cursive, sans-serif !important;
+  font-size: 0.85em !important;
+  font-weight: 600 !important;
+  font-style: italic !important;
+  letter-spacing: 0.5px !important;
 }
 
 @media (max-width: 900px) {
   #c2canvasdiv input[type="text"],
   #c2canvasdiv input {
-    font-size: clamp(12px, 2vw, 16px) !important;
-    padding: 3px 6px !important;
+    font-size: clamp(16px, 2.4vw, 24px) !important;
+    padding: 3px 12px 3px clamp(10px, 1.5vw, 16px) !important;
   }
 }
 
 @media (orientation: portrait), (max-width: 600px) {
   #c2canvasdiv input[type="text"],
   #c2canvasdiv input {
-    font-size: clamp(10.5px, 3.2vw, 13px) !important;
-    padding: 2px 4px !important;
-    letter-spacing: 0px !important;
-    border-radius: 6px !important;
+    font-size: clamp(13px, 3.6vw, 18px) !important;
+    padding: 2px 8px 2px 10px !important;
+    letter-spacing: 0.5px !important;
   }
 }
 
 @media (orientation: portrait) and (max-width: 380px) {
   #c2canvasdiv input[type="text"],
   #c2canvasdiv input {
-    font-size: 11px !important;
-    padding: 1px 3px !important;
+    font-size: 12px !important;
+    padding: 1px 4px !important;
   }
 }
 
 #c2canvasdiv input:focus {
   outline: none !important;
-  background-color: #fff7eb !important;
-  box-shadow: 
-    0 0 0 3px rgba(245, 176, 65, 0.6),
-    0 0 20px rgba(245, 176, 65, 0.4),
-    inset 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-  transform: scale(1.02) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .input-invalid-shake {
   animation: inputShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
-  box-shadow: 
-    0 0 0 4px rgba(231, 76, 60, 0.8) !important,
-    0 0 25px rgba(231, 76, 60, 0.6) !important;
-  background-color: #ffeaea !important;
+  color: #c0392b !important;
+  text-shadow: 0 0 14px rgba(231, 76, 60, 0.7) !important;
 }
 
 @keyframes inputShake {
-  10%, 90% { transform: translate3d(-3px, 0, 0); }
-  20%, 80% { transform: translate3d(5px, 0, 0); }
+  10%, 90% { transform: translate3d(-4px, 0, 0); }
+  20%, 80% { transform: translate3d(6px, 0, 0); }
   30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
   40%, 60% { transform: translate3d(6px, 0, 0); }
 }
@@ -861,10 +882,10 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 /* 1. Top Scalloped Box - Player Name */
 .result-slot-name {
   position: absolute;
-  top: 26.5%;
-  left: 25.5%;
-  width: 58%;
-  height: 16%;
+  top: 31.0%;
+  left: 24.5%;
+  width: 54.0%;
+  height: 14.0%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -882,7 +903,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .title-prefix {
   font-family: var(--font-game);
-  font-size: clamp(22px, 2.3vw, 36px);
+  font-size: clamp(20px, 2.1vw, 34px);
   font-weight: 700;
   color: #7d441c;
   letter-spacing: 2px;
@@ -891,7 +912,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .title-name {
   font-family: var(--font-game);
-  font-size: clamp(38px, 4.4vw, 64px);
+  font-size: clamp(34px, 4.0vw, 58px);
   font-weight: 800;
   color: #2b1103;
   letter-spacing: 1.5px;
@@ -899,73 +920,68 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   text-shadow: 0 2px 4px rgba(255, 255, 255, 0.95);
 }
 
-/* 2. Stat Cards Common Positioning */
-.result-card {
+/* 2. Header Labels on Beige Ribbons */
+.result-card-banner {
   position: absolute;
-  width: 17.5%;
-  height: 15%;
-  top: 54.0%;
+  top: 53.8%;
+  height: 5.6%;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  font-family: var(--font-game);
+  font-size: clamp(12px, 1.25vw, 18px);
+  font-weight: 700;
+  color: #4a240c;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+
+.result-banner-clock {
+  left: 29.7%;
+  width: 14.6%;
+  animation: slotPop 0.5s 0.2s var(--ease-spring) both;
+}
+
+.result-banner-speedo {
+  left: 45.6%;
+  width: 16.0%;
+  animation: slotPop 0.5s 0.3s var(--ease-spring) both;
+}
+
+.result-banner-medal {
+  left: 64.5%;
+  width: 14.8%;
+  animation: slotPop 0.5s 0.4s var(--ease-spring) both;
+}
+
+/* 3. Inner Values inside Pre-Drawn Colored Boxes */
+.result-card-val {
+  position: absolute;
+  top: 60.5%;
+  height: 9.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   pointer-events: none;
   font-family: var(--font-game);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.result-card-clock {
-  left: 26.35%; /* Center around 35.1% */
-  animation: slotPop 0.5s 0.25s var(--ease-spring) both;
-}
-
-.result-card-speedo {
-  left: 44.75%; /* Center around 53.5% */
-  animation: slotPop 0.5s 0.35s var(--ease-spring) both;
-}
-
-.result-card-medal {
-  left: 63.15%; /* Center around 71.9% */
-  animation: slotPop 0.5s 0.45s var(--ease-spring) both;
-}
-
-/* Header Label on Beige Banner */
-.result-card-label {
-  font-family: var(--font-game);
-  font-size: clamp(13px, 1.22vw, 17px);
-  font-weight: 700;
-  color: #431f08;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  letter-spacing: 0.3px;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
-  margin-bottom: 8px;
-}
-
-/* Inner Values */
-.result-card-box {
-  width: 90%;
-  height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-/* Card 1: Clock White Box */
-.result-clock-box {
+.result-val-clock {
+  left: 29.7%;
+  width: 14.6%;
   flex-direction: column;
-  background: #ffffff;
-  border: 2px solid #cbd5e1;
-  border-radius: 14px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 3px 6px rgba(0, 0, 0, 0.08);
-  padding: 2px 6px;
+  animation: slotPop 0.5s 0.25s var(--ease-spring) both;
 }
 
 .result-time-num {
   font-family: var(--font-game);
-  font-size: clamp(26px, 2.7vw, 40px);
+  font-size: clamp(24px, 2.6vw, 42px);
   font-weight: 800;
   color: #1e1309;
   line-height: 1.05;
@@ -975,26 +991,36 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 .result-time-unit {
   font-family: var(--font-game);
   font-size: clamp(10px, 0.9vw, 13px);
-  font-weight: 600;
-  color: #684528;
+  font-weight: 700;
+  color: #6d4224;
   line-height: 1;
   margin-top: 1px;
 }
 
-/* Card 2: Speedometer Category Text (inside the yellow box) */
+.result-val-speedo {
+  left: 45.6%;
+  width: 16.0%;
+  animation: slotPop 0.5s 0.35s var(--ease-spring) both;
+}
+
 .result-category-text {
   font-family: var(--font-game);
-  font-size: clamp(20px, 2.1vw, 32px);
+  font-size: clamp(18px, 1.95vw, 32px);
   font-weight: 800;
   color: #2a1204;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
   letter-spacing: 0.3px;
 }
 
-/* Card 3: Medal Predicate Text (inside the teal box) */
+.result-val-medal {
+  left: 64.5%;
+  width: 14.8%;
+  animation: slotPop 0.5s 0.45s var(--ease-spring) both;
+}
+
 .result-predicate-text {
   font-family: var(--font-game);
-  font-size: clamp(17px, 1.85vw, 27px);
+  font-size: clamp(15px, 1.65vw, 25px);
   font-weight: 800;
   color: #073b22;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
@@ -1002,20 +1028,20 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 @keyframes slotPop {
-  0% { transform: translateY(18px) scale(0.8); opacity: 0; }
+  0% { transform: translateY(18px) scale(0.85); opacity: 0; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* 5. Bottom Wooden Buttons - 4 Full-Sized Thematic Buttons */
+/* 4. Bottom Wooden Action Buttons - Resting cleanly on the desk table */
 .result-wood-actions {
   position: absolute;
-  top: 88.2%;
-  left: 53.0%;
+  top: 84.5%;
+  left: 51.5%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   pointer-events: auto;
   animation: slideUpFade 0.5s 0.55s var(--ease-spring) both;
 }
@@ -1277,284 +1303,517 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   border: 1.5px solid rgba(245, 176, 65, 0.4);
 }
 
-/* Certificate View */
-.cert-card {
-  background: #fdf6e2;
+/* ==========================================================================
+   A4 LANDSCAPE DETECTIVE CERTIFICATE (PIAGAM INVESTIGASI RESMI)
+   Proportion: A4 Landscape (297mm x 210mm, ratio ~1.414 : 1)
+   ========================================================================== */
+#certificate-modal .detective-modal-card {
+  max-width: 980px;
+  background: #111a2e;
+}
+
+#certificate-modal .modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cert-card-a4 {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  aspect-ratio: 297 / 210;
+  background: #fdfaf2;
   background-image: 
-    radial-gradient(circle at 50% 50%, rgba(245, 176, 65, 0.08) 0%, transparent 80%),
-    repeating-linear-gradient(45deg, rgba(139, 90, 43, 0.02) 0px, rgba(139, 90, 43, 0.02) 2px, transparent 2px, transparent 8px);
-  border: 10px double #8b5a2b;
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.9) 0%, rgba(253, 246, 226, 0.95) 75%),
+    repeating-linear-gradient(45deg, rgba(180, 115, 45, 0.02) 0px, rgba(180, 115, 45, 0.02) 2px, transparent 2px, transparent 8px);
+  border: 7px solid #4a2818;
   border-radius: 12px;
-  padding: 30px;
+  box-shadow: 
+    0 15px 45px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px #d4af37,
+    inset 0 0 35px rgba(212, 175, 55, 0.15);
+  padding: 14px;
   color: #2c1810;
   text-align: center;
-  box-shadow: inset 0 0 40px rgba(139, 90, 43, 0.15), 0 10px 30px rgba(0,0,0,0.4);
+  box-sizing: border-box;
+  overflow: hidden;
+  user-select: text;
 }
 
-.cert-title {
+/* Corner Ornaments */
+.cert-corner-ornament {
+  position: absolute;
+  font-size: 20px;
+  color: #b45309;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+}
+.cert-corner-tl { top: 18px; left: 18px; }
+.cert-corner-tr { top: 18px; right: 18px; }
+.cert-corner-bl { bottom: 18px; left: 18px; }
+.cert-corner-br { bottom: 18px; right: 18px; }
+
+/* Inner Ornate Frame */
+.cert-inner-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 2px dashed #b45309;
+  border-radius: 8px;
+  padding: 14px 24px 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Institution Header - Hidden as requested by user */
+.cert-header-institution {
+  display: none !important;
+}
+
+.cert-badge-crest {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
+
+.cert-inst-text {
+  text-align: center;
+  line-height: 1.25;
+}
+
+.cert-inst-kemen {
   font-family: var(--font-game);
-  font-size: 28px;
+  font-size: clamp(9px, 1.0vw, 11px);
   font-weight: 700;
-  color: #4a2818;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
+  color: #78350f;
+  text-transform: uppercase;
 }
 
-.cert-sub {
+.cert-inst-bbgtk {
   font-family: var(--font-game);
-  font-size: 14px;
-  color: #8c5a32;
+  font-size: clamp(10px, 1.15vw, 13px);
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #3b1d08;
+  text-transform: uppercase;
+}
+
+.cert-inst-app {
+  font-family: var(--font-game);
+  font-size: clamp(8.5px, 0.95vw, 10.5px);
+  color: #92400e;
   font-weight: 600;
-  margin: 4px 0 16px;
 }
 
-.cert-name {
+/* Gold Divider */
+.cert-gold-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 2px;
+}
+
+.cert-divider-line {
+  flex: 1;
+  max-width: 220px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+}
+
+.cert-divider-diamond {
+  color: #d4af37;
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+/* Main Certificate Titles */
+.cert-main-title {
   font-family: var(--font-game);
-  font-size: 38px;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin: 10px 0 14px;
-  text-decoration: underline;
-  text-decoration-color: #d4af37;
+  font-size: clamp(22px, 2.7vw, 32px);
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #4a1d06;
+  text-transform: uppercase;
+  line-height: 1.1;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
-.cert-stats-grid {
+.cert-honor-title {
+  font-family: var(--font-game);
+  font-size: clamp(11px, 1.3vw, 14.5px);
+  font-weight: 700;
+  color: #b45309;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* Recipient Preamble & Name */
+.cert-recipient-preamble {
+  font-family: var(--font-game);
+  font-size: clamp(10px, 1.1vw, 12.5px);
+  color: #6b3510;
+  margin-top: 2px;
+}
+
+.cert-recipient-name {
+  font-family: var(--font-game);
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 800;
+  color: #1e3a8a;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 1.15;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  margin-top: 2px;
+}
+
+.cert-name-underline {
+  width: 220px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #d4af37 20%, #d4af37 80%, transparent);
+  margin: 1px auto 4px;
+  border-radius: 999px;
+}
+
+/* Citation */
+.cert-citation {
+  font-family: var(--font-game);
+  font-size: clamp(10.5px, 1.15vw, 13px);
+  line-height: 1.35;
+  color: #431f08;
+  max-width: 680px;
+  margin: 0 auto 6px;
+}
+
+/* Metric Matrix Row (3 plaques) */
+.cert-matrix-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin: 20px 0;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.cert-stat-box {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid #d4af37;
+.cert-plaque {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid #d4af37;
   border-radius: 8px;
-  padding: 10px;
+  padding: 6px 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.cert-stat-lbl {
+.cert-plaque-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.cert-plaque-label {
   font-family: var(--font-game);
-  font-size: 12px;
-  text-transform: uppercase;
+  font-size: clamp(8.5px, 0.95vw, 10.5px);
+  font-weight: 700;
+  letter-spacing: 0.8px;
   color: #78350f;
-  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
-.cert-stat-val {
+.cert-plaque-val {
   font-family: var(--font-game);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: clamp(15px, 1.7vw, 21px);
+  font-weight: 800;
   color: #1e3a8a;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.cert-plaque-sub {
+  font-family: var(--font-game);
+  font-size: clamp(8px, 0.85vw, 10px);
+  font-weight: 600;
+  color: #8c5a32;
+  margin-top: 1px;
+}
+
+/* Stars Row */
+.cert-stars-row {
+  margin: 4px 0 2px;
+  font-size: clamp(15px, 1.7vw, 20px);
+  color: #eab308;
+  letter-spacing: 4px;
+  text-shadow: 0 1px 4px rgba(234, 179, 8, 0.4);
+}
+
+/* Footer Verification & Signatures */
+.cert-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px dashed #b45309;
+  padding-top: 8px;
   margin-top: 4px;
 }
 
-.cert-footer {
+.cert-foot-left {
+  text-align: left;
+  line-height: 1.3;
+}
+
+.cert-foot-meta-title {
   font-family: var(--font-game);
+  font-size: clamp(8.5px, 0.9vw, 10.5px);
+  font-weight: 800;
+  color: #78350f;
+  letter-spacing: 0.5px;
+}
+
+.cert-foot-date,
+.cert-foot-reg,
+.cert-foot-inst {
+  font-family: var(--font-game);
+  font-size: clamp(8.5px, 0.9vw, 10.5px);
+  color: #4a2818;
+}
+
+/* Center Medallion Seal */
+.cert-gold-seal {
+  position: relative;
+  width: 58px;
+  height: 58px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 24px;
-  padding-top: 14px;
-  border-top: 1px dashed #b45309;
-  font-size: 13px;
-  color: #78350f;
+  justify-content: center;
 }
 
-.cert-seal {
-  font-size: 42px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+.cert-seal-outer {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fde047 20%, #d97706 70%, #92400e 100%);
+  border: 2px dashed #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
+.cert-seal-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: #fffdf0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.cert-seal-star {
+  font-size: 11px;
+}
+
+.cert-seal-text {
+  font-family: var(--font-game);
+  font-size: 6.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
+}
+
+.cert-seal-year {
+  font-family: var(--font-game);
+  font-size: 6px;
+  font-weight: 700;
+  color: #fef08a;
+  margin-top: 1px;
+}
+
+.cert-ribbon-tail {
+  position: absolute;
+  bottom: -10px;
+  width: 14px;
+  height: 24px;
+  background: #b91c1c;
+  z-index: 1;
+}
+
+.cert-ribbon-tail.left {
+  left: 15px;
+  transform: rotate(18deg);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+}
+
+.cert-ribbon-tail.right {
+  right: 15px;
+  transform: rotate(-18deg);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+}
+
+.cert-foot-right {
+  text-align: right;
+  line-height: 1.3;
+}
+
+.cert-foot-status-badge {
+  display: inline-block;
+  font-family: var(--font-game);
+  font-size: clamp(8.5px, 0.9vw, 10.5px);
+  font-weight: 800;
+  color: #065f46;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+.cert-foot-sign-role,
+.cert-foot-sign-org {
+  font-family: var(--font-game);
+  font-size: clamp(8.5px, 0.9vw, 10.5px);
+  color: #4a2818;
+  font-weight: 600;
+}
+
+.cert-foot-hash {
+  font-family: monospace;
+  font-size: clamp(7.5px, 0.8vw, 9.5px);
+  color: #92400e;
 }
 
 /* ==========================================================================
-   MOBILE RESPONSIVENESS FOR HASIL AKHIR & MODALS
+   PRINT SPECIFIC RULES (EXACT A4 LANDSCAPE FULL-PAGE)
    ========================================================================== */
-@media (max-width: 650px), (orientation: portrait) {
-  /* Hasil Akhir Overlay */
-  .title-prefix {
-    font-size: clamp(10px, 2.3vw, 24px) !important;
-  }
-  .title-name {
-    font-size: clamp(15px, 4.2vw, 38px) !important;
-  }
-  .result-card-label {
-    font-size: clamp(9px, 1.8vw, 15px) !important;
-  }
-  .result-time-num {
-    font-size: clamp(15px, 3.2vw, 30px) !important;
-  }
-  .result-category-text {
-    font-size: clamp(11px, 2.3vw, 22px) !important;
-  }
-  .result-predicate-text {
-    font-size: clamp(10px, 2.1vw, 20px) !important;
-  }
-  .result-wood-actions {
-    top: 86.5% !important;
-    left: 50% !important;
-    gap: 4px !important;
-    width: 96% !important;
-    max-width: 380px !important;
-    justify-content: center !important;
-  }
-  .wood-action-btn {
-    padding: 3px 7px 3px 4px !important;
-    font-size: 10px !important;
-    gap: 4px !important;
-    border-width: 2px !important;
-    box-shadow: 0 2px 0 #331504, 0 4px 8px rgba(0, 0, 0, 0.4) !important;
-  }
-  .wood-icon-bubble {
-    width: 20px !important;
-    height: 20px !important;
-    font-size: 11px !important;
-    border-width: 1.5px !important;
-  }
-  .wood-text {
-    letter-spacing: 0.2px !important;
-  }
-
-  /* Game Alert Modal */
-  .game-alert-modal-card {
-    padding: 24px 16px 20px !important;
-    border-radius: 20px !important;
-    border-width: 3.5px !important;
-    max-width: 92vw !important;
-  }
-  .alert-modal-badge {
-    width: 60px !important;
-    height: 60px !important;
-    font-size: 26px !important;
-    border-width: 3px !important;
-  }
-  .alert-modal-badge-wrapper {
-    margin-top: -46px !important;
-  }
-  .alert-modal-title {
-    font-size: 19px !important;
-  }
-  .alert-modal-content {
-    font-size: 13.5px !important;
-    margin-bottom: 16px !important;
-  }
-  .alert-highlight {
-    font-size: 14.5px !important;
-    padding: 8px 10px !important;
-  }
-  .alert-hint {
-    font-size: 12.5px !important;
-  }
-
-  /* Leaderboard & Certificate Modal */
-  .detective-modal-backdrop {
-    padding: 10px 8px !important;
-  }
-  .detective-modal-card {
-    border-radius: 18px !important;
-    border-width: 2.5px !important;
-    max-height: 94vh !important;
-  }
-  .modal-header {
-    padding: 12px 14px !important;
-  }
-  .modal-title {
-    font-size: 17px !important;
-    gap: 8px !important;
-  }
-  .modal-body {
-    padding: 12px 10px !important;
-  }
-  .leaderboard-item {
-    padding: 8px 10px !important;
-    gap: 8px !important;
-  }
-  .lb-rank {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 14px !important;
-  }
-  .lb-name {
-    font-size: 13.5px !important;
-    max-width: 105px !important;
-  }
-  .lb-meta {
-    font-size: 10px !important;
-  }
-  .lb-time {
-    font-size: 15px !important;
-  }
-  .lb-badge {
-    font-size: 10px !important;
-    padding: 3px 7px !important;
-  }
-
-  /* Certificate on Mobile */
-  .cert-card {
-    padding: 14px 10px !important;
-    border-width: 6px !important;
-  }
-  .cert-title {
-    font-size: 18px !important;
-  }
-  .cert-sub {
-    font-size: 11px !important;
-    margin: 2px 0 8px !important;
-  }
-  .cert-name {
-    font-size: 22px !important;
-    margin: 6px 0 10px !important;
-  }
-  .cert-stats-grid {
-    gap: 6px !important;
-    margin: 12px 0 !important;
-  }
-  .cert-stat-box {
-    padding: 6px 4px !important;
-  }
-  .cert-stat-lbl {
-    font-size: 9px !important;
-  }
-  .cert-stat-val {
-    font-size: 13px !important;
-  }
-  .cert-footer {
-    margin-top: 14px !important;
-    padding-top: 8px !important;
-    font-size: 10px !important;
-  }
-  .cert-seal {
-    font-size: 28px !important;
-  }
-}
-
-/* Print specific rules for Certificate */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4 landscape;
+    margin: 0;
   }
-  #certificate-modal,
-  #certificate-modal * {
-    visibility: visible;
+
+  html, body {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
+  /* CRITICAL: Completely hide all non-certificate DOM trees using display: none so they DO NOT take up layout space */
+  #c2canvasdiv,
+  #c2canvas,
+  canvas,
+  .screen-vignette,
+  .thematic-game-hud,
+  .game-hud-player,
+  .game-hud-actions,
+  .hasil-akhir-overlay,
+  .game-alert-modal-backdrop,
+  #leaderboard-modal,
+  #stage-wrapper,
+  .preview-header,
+  .test-controls,
+  .modal-backdrop:not(#certificate-modal) {
+    display: none !important;
+  }
+
+  /* Modal becomes the full document page */
   #certificate-modal {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    background: none;
+    display: block !important;
+    position: static !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    min-height: 210mm !important;
+    max-width: 297mm !important;
+    max-height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
+
+  .detective-modal-card {
+    display: block !important;
+    position: static !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    max-width: 297mm !important;
+    max-height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    overflow: hidden !important;
+    visibility: visible !important;
+  }
+
   .modal-header,
   .modal-close-btn,
   #btn-print-cert {
     display: none !important;
   }
-  .detective-modal-card {
-    border: none;
-    box-shadow: none;
-    max-width: 100%;
+
+  .modal-body {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+  }
+
+  .cert-card-a4 {
+    width: 297mm !important;
+    height: 210mm !important;
+    max-width: 297mm !important;
+    max-height: 210mm !important;
+    aspect-ratio: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 10mm 14mm !important;
+    box-sizing: border-box !important;
+    visibility: visible !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  .cert-inner-frame {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 8mm 14mm !important;
+    box-sizing: border-box !important;
+  }
+
+  .cert-header-institution {
+    display: none !important;
   }
 }

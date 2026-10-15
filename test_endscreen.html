@@ -2,45 +2,54 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Preview Hasil Akhir - Detektif Cerita</title>
-  <link rel="stylesheet" href="detektif_style.css?v=20261013_v5">
+  <title>QA Testing Dashboard - Detektif Cerita</title>
+  <link rel="stylesheet" href="detektif_style.css?v=20261015_v3">
   <style>
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      background: #0d1522;
+      background: #090e17;
       margin: 0;
-      padding: 20px;
-      font-family: 'Outfit', sans-serif;
+      padding: 16px;
+      font-family: 'Fredoka', 'Outfit', sans-serif;
+      color: #fff;
+      overflow-y: auto;
     }
     .preview-header {
       color: #f5b041;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 800;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       text-align: center;
+      letter-spacing: 0.5px;
     }
     .test-controls {
       display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      max-width: 1000px;
     }
     .test-btn {
       padding: 8px 16px;
       border-radius: 999px;
       border: 1.5px solid #f5b041;
-      background: rgba(30, 48, 80, 0.8);
+      background: rgba(30, 48, 80, 0.9);
       color: #fff;
       font-weight: 700;
       cursor: pointer;
       font-size: 13px;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
     .test-btn:hover {
       background: #f5b041;
       color: #000;
+      transform: translateY(-2px);
     }
     #stage-wrapper {
       position: relative;
@@ -48,9 +57,10 @@
       height: 720px;
       max-width: 95vw;
       max-height: calc(95vw * 9 / 16);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(245, 176, 65, 0.3);
       border-radius: 8px;
       overflow: hidden;
+      background: #000;
     }
     #stage-bg {
       position: absolute;
@@ -72,38 +82,117 @@
   </style>
 </head>
 <body>
+  <div class="preview-header">🔍 QA Testing Hub - Detektif Cerita</div>
+  <div class="test-controls">
+    <button class="test-btn" onclick="testScenario('LALA', 335)">1. Hasil Akhir: LALA (05:35, Superior)</button>
+    <button class="test-btn" onclick="showCertificate()">2. Buka Piagam (A4 Landscape)</button>
+    <button class="test-btn" onclick="testNameInput()">3. Test Input Nama (Identitas)</button>
+    <button class="test-btn" onclick="testMisi7()">4. Test Misi 7 (Tombol Selanjutnya Bebas)</button>
+    <button class="test-btn" onclick="testAlert()">5. Test Alert Teka-teki Belum Selesai</button>
+  </div>
+
   <div id="stage-wrapper">
-    <img id="stage-bg" src="images/bg_feedbackakhir-sheet0.png" alt="Background Feedback Akhir">
+    <img id="stage-bg" src="images/bg_feedbackakhir-sheet0.png" alt="Background Stage">
     <div id="c2canvasdiv"></div>
   </div>
 
   <!-- Detective Engine -->
-  <script src="detektif_engine.js?v=20261013_v5"></script>
+  <script src="detektif_engine.js?v=20261015_v3"></script>
   <script>
     function testScenario(name, secs) {
+      document.getElementById('stage-bg').src = 'images/bg_feedbackakhir-sheet0.png';
+      DetectiveEngine.removeHasilAkhirOverlay();
       DetectiveEngine.playerName = name;
       DetectiveEngine.elapsedSeconds = secs;
       DetectiveEngine.finishGame();
     }
 
+    function showCertificate() {
+      DetectiveEngine.playerName = 'LALA';
+      DetectiveEngine.elapsedSeconds = 335;
+      DetectiveEngine.currentResult = {
+        id: Date.now(),
+        name: 'LALA',
+        totalSeconds: 335,
+        timeFormatted: '05:35',
+        timeText: '5 Menit 35 Detik',
+        category: 'Sangat Cepat',
+        predicate: 'Superior',
+        predTitle: 'Detektif Superior',
+        stars: 5,
+        dateStr: new Date().toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })
+      };
+      DetectiveEngine.openModal('certificate-modal');
+    }
+
+    function testNameInput() {
+      document.getElementById('stage-bg').src = 'images/bg_identitaspengguna-sheet0.png';
+      DetectiveEngine.removeHasilAkhirOverlay();
+      var c2div = document.getElementById('c2canvasdiv');
+      c2div.innerHTML = '';
+      
+      // Create mock Construct 2 TextBox input matching layout coords (640, 480, 580, 115)
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.style.position = 'absolute';
+      inp.style.left = '37.5%';
+      inp.style.top = '50.0%';
+      inp.style.width = '34.0%';
+      inp.style.height = '12.0%';
+      c2div.appendChild(inp);
+      
+      DetectiveEngine.onLayoutChanged('identitas pengguna');
+      setTimeout(function () {
+        inp.focus();
+      }, 100);
+    }
+
+    function testMisi7() {
+      document.getElementById('stage-bg').src = 'images/bg_misi7-sheet0.png';
+      DetectiveEngine.removeHasilAkhirOverlay();
+      var c2div = document.getElementById('c2canvasdiv');
+      c2div.innerHTML = '';
+
+      // Mock C2 button_selanjutnya at (1502, 897) in 1708x960
+      var nextBtn = document.createElement('div');
+      nextBtn.style.position = 'absolute';
+      nextBtn.style.right = '20px';
+      nextBtn.style.bottom = '16px';
+      nextBtn.style.width = '240px';
+      nextBtn.style.height = '50px';
+      nextBtn.style.background = '#38bdf8';
+      nextBtn.style.border = '3px solid #0284c7';
+      nextBtn.style.borderRadius = '999px';
+      nextBtn.style.color = '#000';
+      nextBtn.style.display = 'flex';
+      nextBtn.style.alignItems = 'center';
+      nextBtn.style.justifyContent = 'center';
+      nextBtn.style.fontWeight = '800';
+      nextBtn.style.fontSize = '20px';
+      nextBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+      nextBtn.textContent = 'Selanjutnya ➜';
+      nextBtn.style.cursor = 'pointer';
+      nextBtn.onclick = function () {
+        DetectiveEngine.triggerMissionWarning('misi 7', 1, 3);
+      };
+      c2div.appendChild(nextBtn);
+
+      DetectiveEngine.onLayoutChanged('misi 7');
+    }
+
     function testAlert() {
-      try {
-        DetectiveEngine.triggerMissionWarning('misi 3', 0, 9);
-        var m = document.getElementById('game-alert-modal');
-        document.getElementById('debug-log').textContent = 'Status: Modal alert triggered! Modal class: ' + (m ? m.className : 'null');
-      } catch (e) {
-        document.getElementById('debug-log').textContent = 'Error: ' + e.message;
-      }
+      DetectiveEngine.triggerMissionWarning('misi 7', 1, 3);
     }
 
     window.addEventListener('DOMContentLoaded', function () {
+      DetectiveEngine.init();
       setTimeout(function () {
-        if (window.location.search.indexOf('show=alert') !== -1) {
-          testAlert();
-        } else {
-          testScenario('Lala', 515); // Default: 08:35 (< 10 Menit -> Sangat Cepat, Superior)
-        }
-      }, 300);
+        testScenario('LALA', 335); // 05:35 (< 10 Menit -> Sangat Cepat, Detektif Superior)
+      }, 250);
     });
   </script>
 </body>

@@ -335,6 +335,7 @@
           try {
             localStorage.setItem('NamaPemain', nameVal);
           } catch (e) {}
+          self.resetAllMissionProgress();
           self.startTimer();
           self.updateHUDPlayer();
         }
@@ -412,7 +413,6 @@
 
           var config = self.missionTargets[self.currentLayoutName];
           if (!config) return;
-          if (self.completedMissions[self.currentLayoutName]) return;
 
           var isNextBtn = false;
           if (type && type.name) {
@@ -431,6 +431,7 @@
           if (isNextBtn) {
             var currentVal = self.getC2Var(config.varName) || 0;
             if (currentVal < config.target) {
+              self.completedMissions[self.currentLayoutName] = false;
               self.triggerMissionWarning(self.currentLayoutName, currentVal, config.target);
             }
           }
@@ -529,9 +530,18 @@
           this.finishGame();
         }
       } else if (isGameplay) {
-        // Gameplay (Misi 1 - 10, dsb): Papan Skor & Fullscreen di pojok kanan bawah
-        if (actionsHud) actionsHud.style.display = 'flex';
-        // Nama Pemain di pojok kiri bawah: Tampilkan badge detektif saat misi berlangsung
+        // Gameplay (Misi 1 - 10, dsb): Sembunyikan tombol Papan Skor (hanya ada di akhir & beranda), Pertahankan tombol Nama Detektif
+        if (actionsHud) {
+          actionsHud.style.display = 'flex';
+          actionsHud.classList.add('hud-no-scoreboard');
+          var isUrutanAlur = (layoutName === 'misi 7' || layoutName === 'misi 8' || layoutName === 'misi 9' || layoutName === 'misi 10');
+          if (isUrutanAlur) {
+            actionsHud.classList.add('hud-shift-misi-alur');
+          } else {
+            actionsHud.classList.remove('hud-shift-misi-alur');
+          }
+        }
+        // Nama Pemain di pojok kiri bawah: DIPERTAHANKAN saat misi berlangsung
         if (playerHud) {
           var activeName = this.playerName || this.getC2Var('namapemain') || localStorage.getItem('NamaPemain') || 'Detektif';
           if (activeName && activeName.trim().length > 0) {
@@ -541,37 +551,56 @@
           this.updateHUDPlayer();
         }
       } else if (isMainMenu) {
-        // Beranda: Papan Skor & Fullscreen di pojok kanan bawah
-        if (actionsHud) actionsHud.style.display = 'flex';
+        // Beranda: Papan Skor & Fullscreen tampil di pojok kanan bawah
+        if (actionsHud) {
+          actionsHud.style.display = 'flex';
+          actionsHud.classList.remove('hud-no-scoreboard');
+          actionsHud.classList.remove('hud-shift-misi-alur');
+        }
         // Di Beranda: Sembunyikan badge nama karena pemain belum mengisi identitas
         if (playerHud) {
           playerHud.style.display = 'none';
         }
       } else {
         // Menu pendukung lainnya (materi, tujuan, informasi, profil)
-        if (actionsHud) actionsHud.style.display = 'flex';
+        if (actionsHud) {
+          actionsHud.style.display = 'flex';
+          actionsHud.classList.add('hud-no-scoreboard');
+          actionsHud.classList.remove('hud-shift-misi-alur');
+        }
         // Sembunyikan badge nama di menu pendukung agar tampilan bersih
         if (playerHud) {
           playerHud.style.display = 'none';
         }
       }
 
-      // If on 'identitas pengguna', enhance input element and reset name
+      // If on 'identitas pengguna', enhance input element and reset progress
       if (layoutName === 'identitas pengguna') {
         this.playerName = '';
         this.updateHUDPlayer();
+        this.resetAllMissionProgress();
         this.enhanceNameInput();
       }
 
-      // If returning to main menu, stop timer and reset session if not finished
+      // If returning to main menu, reset all mission progress
       if (layoutName === 'main menu' || layoutName === 'main menu 2') {
-        if (!this.isGameActive) {
-          this.elapsedSeconds = 0;
+        this.resetAllMissionProgress();
+      }
+
+      // When starting any mission layout, ensure its progress is pristine
+      if (layoutName.indexOf('misi ') === 0) {
+        this.completedMissions[layoutName] = false;
+        var mTarget = this.missionTargets[layoutName];
+        if (mTarget) {
+          var curVal = this.getC2Var(mTarget.varName);
+          if (curVal === null || curVal >= mTarget.target) {
+            this.setC2Var(mTarget.varName, 0);
+          }
         }
       }
     },
 
-    // Name Input Enhancement
+    // Name Input Enhancement - Fits perfectly inside the pre-drawn parchment pill capsule
     enhanceNameInput: function () {
       var self = this;
       var attempts = 0;
@@ -581,7 +610,8 @@
         if (input) {
           clearInterval(interval);
 
-          // Disable C2 TextBox automatic font size recalculation which blows up font size on mobile
+          // Position C2 TextBox instance directly over the pre-drawn pill capsule in layout coordinates (1708x960)
+          // The background image pill text zone is X: 640 to 1227, Y: 480 to 595
           try {
             var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
             if (rt && rt.types_by_index) {
@@ -590,7 +620,14 @@
                 if (t && t.plugin && (t.plugin.id === 5 || t.name === 't195')) {
                   if (t.instances) {
                     for (var j = 0; j < t.instances.length; j++) {
-                      t.instances[j].autoFontSize = false;
+                      var inst = t.instances[j];
+                      inst.autoFontSize = false;
+                      inst.x = 640;
+                      inst.y = 480;
+                      inst.width = 580;
+                      inst.height = 115;
+                      inst.set_bbox_changed();
+                      if (inst.updatePosition) inst.updatePosition();
                     }
                   }
                 }
@@ -600,20 +637,32 @@
 
           var isMobile = (window.innerWidth <= 600) || (window.innerHeight > window.innerWidth);
           input.value = '';
-          input.setAttribute('placeholder', isMobile ? 'Ketik nama...' : 'Ketik nama detektif...');
+          input.setAttribute('placeholder', isMobile ? 'Ketik nama detektif...' : 'Ketik nama detektif...');
           input.setAttribute('maxlength', '20');
           input.setAttribute('autocomplete', 'off');
           input.setAttribute('spellcheck', 'false');
           input.classList.add('c2-input-name');
 
-          // Force proper font size and padding inline with !important priority
+          // Styling seamlessly integrates with the pre-drawn parchment capsule (no awkward white box!)
+          input.style.setProperty('background', 'transparent', 'important');
+          input.style.setProperty('border', 'none', 'important');
+          input.style.setProperty('box-shadow', 'none', 'important');
+          input.style.setProperty('outline', 'none', 'important');
+          input.style.setProperty('border-radius', '999px', 'important');
+          input.style.setProperty('text-align', 'left', 'important');
+          input.style.setProperty('font-family', 'var(--font-game), cursive, sans-serif', 'important');
+          input.style.setProperty('font-weight', '800', 'important');
+          input.style.setProperty('color', '#3a1c07', 'important');
+          input.style.setProperty('caret-color', '#8b5a2b', 'important');
+          input.style.setProperty('letter-spacing', '1.5px', 'important');
+
           if (isMobile) {
-            input.style.setProperty('font-size', '12px', 'important');
-            input.style.setProperty('padding', '2px 4px', 'important');
+            input.style.setProperty('font-size', 'clamp(14px, 3.5vw, 18px)', 'important');
+            input.style.setProperty('padding', '2px 10px 2px 12px', 'important');
             input.style.setProperty('line-height', 'normal', 'important');
           } else {
-            input.style.setProperty('font-size', '16px', 'important');
-            input.style.setProperty('padding', '4px 8px', 'important');
+            input.style.setProperty('font-size', 'clamp(20px, 2.7vw, 38px)', 'important');
+            input.style.setProperty('padding', '4px 16px 4px clamp(14px, 1.8vw, 24px)', 'important');
           }
 
           input.focus();
@@ -658,7 +707,6 @@
 
         var config = self.missionTargets[self.currentLayoutName];
         if (!config) return;
-        if (self.completedMissions[self.currentLayoutName]) return;
 
         var touch = (e.changedTouches && e.changedTouches.length > 0)
           ? e.changedTouches[0]
@@ -686,10 +734,11 @@
         }
 
         if (isHit) {
-          var now = Date.now();
-          if (now - lastTriggerTime < 600) return;
           var currentVal = self.getC2Var(config.varName) || 0;
           if (currentVal < config.target) {
+            self.completedMissions[self.currentLayoutName] = false;
+            var now = Date.now();
+            if (now - lastTriggerTime < 600) return;
             lastTriggerTime = now;
             self.triggerMissionWarning(self.currentLayoutName, currentVal, config.target);
           }
@@ -909,29 +958,23 @@
           '</div>' +
         '</div>' +
 
-        // 2. Alarm Clock slot: Total Time
-        '<div class="result-card result-card-clock">' +
-          '<div class="result-card-label">Total Waktu</div>' +
-          '<div class="result-card-box result-clock-box">' +
-            '<div class="result-time-num">' + record.timeFormatted + '</div>' +
-            '<div class="result-time-unit">menit : detik</div>' +
-          '</div>' +
+        // 2. Alarm Clock slot: Total Time Banner & Value
+        '<div class="result-card-banner result-banner-clock">Total Waktu</div>' +
+        '<div class="result-card-val result-val-clock">' +
+          '<div class="result-time-num">' + record.timeFormatted + '</div>' +
+          '<div class="result-time-unit">menit : detik</div>' +
         '</div>' +
 
-        // 3. Speedometer slot: Time Category (Directly centered in yellow box)
-        '<div class="result-card result-card-speedo">' +
-          '<div class="result-card-label">Kategori Waktu</div>' +
-          '<div class="result-card-box result-category-text">' +
-            record.category +
-          '</div>' +
+        // 3. Speedometer slot: Time Category Banner & Value
+        '<div class="result-card-banner result-banner-speedo">Kategori Waktu</div>' +
+        '<div class="result-card-val result-val-speedo">' +
+          '<div class="result-category-text">' + record.category + '</div>' +
         '</div>' +
 
-        // 4. Medal slot: Predicate (Directly centered in teal box)
-        '<div class="result-card result-card-medal">' +
-          '<div class="result-card-label">Predikat</div>' +
-          '<div class="result-card-box result-predicate-text">' +
-            record.predTitle +
-          '</div>' +
+        // 4. Medal slot: Predicate Banner & Value
+        '<div class="result-card-banner result-banner-medal">Predikat</div>' +
+        '<div class="result-card-val result-val-medal">' +
+          '<div class="result-predicate-text">' + record.predTitle + '</div>' +
         '</div>' +
 
         // 5. Wooden Action Buttons at Bottom (4 Full-Sized Thematic Wooden Buttons)
@@ -972,8 +1015,7 @@
       };
       document.getElementById('btn-main-menu').onclick = function () {
         self.playSound('click');
-        self.stopTimer();
-        self.setC2Var('waktu', 0);
+        self.resetAllMissionProgress();
         self.goToLayout('main menu');
       };
     },
@@ -997,11 +1039,25 @@
       }
     },
 
-    restartGame: function () {
-      this.stopTimer();
+    resetAllMissionProgress: function () {
+      this.completedMissions = {};
+      for (var m in this.missionTargets) {
+        if (this.missionTargets.hasOwnProperty(m)) {
+          this.setC2Var(this.missionTargets[m].varName, 0);
+        }
+      }
       this.setC2Var('waktu', 0);
       this.elapsedSeconds = 0;
-      this.completedMissions = {};
+      this.isGameActive = false;
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+      console.log('🔄 All mission progress, variables, and timer reset to 0');
+    },
+
+    restartGame: function () {
+      this.resetAllMissionProgress();
       this.startTimer();
       this.goToLayout('misi 1');
     },
@@ -1147,7 +1203,7 @@
           '<div class="modal-header">' +
             '<h2 class="modal-title">📜 Piagam Lencana Detektif</h2>' +
             '<div style="display:flex;gap:8px;">' +
-              '<button class="corner-btn" id="btn-print-cert" title="Cetak Piagam" style="width:auto;border-radius:999px;padding:0 14px;font-size:13px;font-weight:700;">🖨️ Cetak</button>' +
+              '<button class="corner-btn" id="btn-print-cert" title="Cetak Piagam Ukuran A4 Landscape" style="width:auto;border-radius:999px;padding:0 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;">🖨️ Cetak Piagam (A4 Landscape)</button>' +
               '<button class="modal-close-btn" data-close="certificate-modal">✕</button>' +
             '</div>' +
           '</div>' +
@@ -1172,7 +1228,16 @@
       });
 
       document.getElementById('btn-print-cert').onclick = function () {
-        window.print();
+        document.body.classList.add('is-printing-cert');
+        setTimeout(function () {
+          window.print();
+        }, 50);
+        window.onafterprint = function () {
+          document.body.classList.remove('is-printing-cert');
+        };
+        setTimeout(function () {
+          document.body.classList.remove('is-printing-cert');
+        }, 2000);
       };
     },
 
@@ -1270,50 +1335,96 @@
         predicate: 'Superior',
         predTitle: 'Detektif Superior',
         stars: 5,
-        dateStr: new Date().toLocaleDateString('id-ID')
+        dateStr: new Date().toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })
       });
 
       var starsStr = '';
-      for (var i = 0; i < (res.stars || 4); i++) {
-        starsStr += '★ ';
+      for (var i = 0; i < (res.stars || 5); i++) {
+        starsStr += '<span class="cert-star">★</span> ';
       }
 
+      var regCode = 'REG-DET/' + (res.id ? String(res.id).slice(-6) : '202601') + '/' + (res.predicate || 'SUP').toUpperCase().slice(0, 3);
+      var verifyCode = 'DET-' + (res.predicate || 'SUPERIOR').toUpperCase() + '-VERIFIED';
+
       body.innerHTML =
-        '<div class="cert-card">' +
-          '<div class="cert-title">Piagam Lencana Detektif</div>' +
-          '<div class="cert-sub">Media Pembelajaran Interaktif Unsur Intrinsik Cerita</div>' +
-          '<div style="font-size:14px;color:#78350f;">Diberikan secara resmi kepada:</div>' +
-          '<div class="cert-name">' + this.escapeHtml(res.name) + '</div>' +
-          '<div style="font-size:14px;color:#4a2818;max-width:440px;margin:0 auto;">' +
-            'Telah berhasil menuntaskan seluruh 10 Misi Kasus Detektif Cerita dengan analisa tajam, ketelitian, dan pemahaman sastra yang unggul.' +
-          '</div>' +
-
-          '<div class="cert-stats-grid">' +
-            '<div class="cert-stat-box">' +
-              '<div class="cert-stat-lbl">Waktu Total</div>' +
-              '<div class="cert-stat-val">' + res.timeFormatted + '</div>' +
+        '<div class="cert-card-a4" id="cert-printable-card">' +
+          '<div class="cert-corner-ornament cert-corner-tl">⚜️</div>' +
+          '<div class="cert-corner-ornament cert-corner-tr">⚜️</div>' +
+          '<div class="cert-corner-ornament cert-corner-bl">⚜️</div>' +
+          '<div class="cert-corner-ornament cert-corner-br">⚜️</div>' +
+          '<div class="cert-inner-frame">' +
+            '<div class="cert-gold-divider top-ornament">' +
+              '<span class="cert-divider-line"></span>' +
+              '<span class="cert-divider-diamond">⚜️ ◆ ✦ ◆ ⚜️</span>' +
+              '<span class="cert-divider-line"></span>' +
             '</div>' +
-            '<div class="cert-stat-box">' +
-              '<div class="cert-stat-lbl">Kategori Waktu</div>' +
-              '<div class="cert-stat-val">' + res.category + '</div>' +
+            '<div class="cert-main-title">PIAGAM PENGHARGAAN</div>' +
+            '<div class="cert-honor-title">LENCANA DETEKTIF SASTRA INDONESIA</div>' +
+            '<div class="cert-recipient-preamble">Diberikan secara resmi dan penuh kehormatan kepada:</div>' +
+            '<div class="cert-recipient-name">' + this.escapeHtml(res.name) + '</div>' +
+            '<div class="cert-name-underline"></div>' +
+            '<div class="cert-citation">' +
+              'Telah berhasil menuntaskan seluruh <strong>10 Misi Investigasi Kasus Detektif Cerita</strong> dengan ketelitian analisa, penalaran deduktif yang tajam, serta pemahaman unsur intrinsik sastra yang unggul.' +
             '</div>' +
-            '<div class="cert-stat-box">' +
-              '<div class="cert-stat-lbl">Predikat Kelulusan</div>' +
-              '<div class="cert-stat-val">' + (res.predTitle || res.predicate) + '</div>' +
+            '<div class="cert-matrix-row">' +
+              '<div class="cert-matrix-col">' +
+                '<div class="cert-plaque">' +
+                  '<div class="cert-plaque-icon">⏱️</div>' +
+                  '<div class="cert-plaque-label">WAKTU INVESTIGASI</div>' +
+                  '<div class="cert-plaque-val">' + res.timeFormatted + '</div>' +
+                  '<div class="cert-plaque-sub">' + res.timeText + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="cert-matrix-col">' +
+                '<div class="cert-plaque cert-plaque-speed">' +
+                  '<div class="cert-plaque-icon">⚡</div>' +
+                  '<div class="cert-plaque-label">KATEGORI WAKTU</div>' +
+                  '<div class="cert-plaque-val">' + res.category + '</div>' +
+                  '<div class="cert-plaque-sub">Investigasi Cekatan</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="cert-matrix-col">' +
+                '<div class="cert-plaque cert-plaque-pred">' +
+                  '<div class="cert-plaque-icon">🏅</div>' +
+                  '<div class="cert-plaque-label">PREDIKAT KELULUSAN</div>' +
+                  '<div class="cert-plaque-val">' + (res.predTitle || res.predicate) + '</div>' +
+                  '<div class="cert-plaque-sub">Kecakapan Sastra Unggul</div>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
-          '</div>' +
-
-          '<div style="color:#d97706;font-size:20px;letter-spacing:2px;margin:10px 0;">' + starsStr + '</div>' +
-
-          '<div class="cert-footer">' +
-            '<div style="text-align:left;">' +
-              '<div>Tanggal: ' + res.dateStr + '</div>' +
-              '<div style="font-size:11px;color:#a16207;">BBGTK Jawa Tengah & Kemendikdasmen</div>' +
+            '<div class="cert-stars-row">' +
+              starsStr +
             '</div>' +
-            '<div class="cert-seal">🎖️</div>' +
-            '<div style="text-align:right;">' +
-              '<div style="font-weight:700;">Status: TERVERIFIKASI</div>' +
-              '<div style="font-size:11px;color:#a16207;">KODE: DETEKTIF-SUPERIOR</div>' +
+            '<div class="cert-footer-grid">' +
+              '<div class="cert-footer-col cert-foot-left">' +
+                '<div class="cert-foot-meta-title">INFORMASI KELULUSAN</div>' +
+                '<div class="cert-foot-date">Tanggal: <strong>' + res.dateStr + '</strong></div>' +
+                '<div class="cert-foot-reg">No. Reg: <strong>' + regCode + '</strong></div>' +
+                '<div class="cert-foot-inst">Media Pembelajaran: Detektif Cerita</div>' +
+              '</div>' +
+              '<div class="cert-footer-col cert-foot-center">' +
+                '<div class="cert-gold-seal">' +
+                  '<div class="cert-seal-outer">' +
+                    '<div class="cert-seal-inner">' +
+                      '<span class="cert-seal-star">★</span>' +
+                      '<span class="cert-seal-text">TERVERIFIKASI</span>' +
+                      '<span class="cert-seal-year">RESMI</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="cert-ribbon-tail left"></div>' +
+                  '<div class="cert-ribbon-tail right"></div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="cert-footer-col cert-foot-right">' +
+                '<div class="cert-foot-status-badge">✓ TERVERIFIKASI & SAH</div>' +
+                '<div class="cert-foot-sign-role">Tim Validasi & Pengembang Media</div>' +
+                '<div class="cert-foot-sign-org">Media Detektif Cerita Interaktif</div>' +
+                '<div class="cert-foot-hash">KODE: ' + verifyCode + '</div>' +
+              '</div>' +
             '</div>' +
           '</div>' +
         '</div>';
