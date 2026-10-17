@@ -118,22 +118,9 @@ html, body {
   animation: fadeInUp 0.4s var(--ease-spring) both;
 }
 
-/* Shift Papan Skor & Fullscreen to the left on missions 7-10 so it never overlaps 'Selanjutnya' */
-.game-hud-actions.hud-shift-misi-alur {
-  right: clamp(340px, 23.5%, 440px) !important;
-  bottom: 16px !important;
-}
-
 /* On gameplay missions, scoreboard button is completely hidden as per user request */
 .game-hud-actions.hud-no-scoreboard #hud-btn-lb {
   display: none !important;
-}
-
-@media (max-width: 1024px) {
-  .game-hud-actions.hud-shift-misi-alur {
-    right: clamp(260px, 24%, 330px) !important;
-    bottom: 12px !important;
-  }
 }
 
 @keyframes fadeInUp {
@@ -681,18 +668,24 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 10000;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   padding: 20px;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: none !important;
   transition: opacity 0.3s ease;
 }
 
 .game-alert-modal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.game-alert-modal-backdrop:not(.active) *,
+.detective-modal-backdrop:not(.active) * {
+  pointer-events: none !important;
 }
 
 .game-alert-modal-card {
@@ -882,10 +875,10 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 /* 1. Top Scalloped Box - Player Name */
 .result-slot-name {
   position: absolute;
-  top: 31.0%;
-  left: 24.5%;
-  width: 54.0%;
-  height: 14.0%;
+  top: 26.5%;
+  left: 25.5%;
+  width: 56.0%;
+  height: 16.5%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -895,15 +888,15 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .result-player-title {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
   font-family: var(--font-game);
 }
 
 .title-prefix {
   font-family: var(--font-game);
-  font-size: clamp(20px, 2.1vw, 34px);
+  font-size: clamp(18px, 2.0vw, 32px);
   font-weight: 700;
   color: #7d441c;
   letter-spacing: 2px;
@@ -912,7 +905,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .title-name {
   font-family: var(--font-game);
-  font-size: clamp(34px, 4.0vw, 58px);
+  font-size: clamp(28px, 3.6vw, 54px);
   font-weight: 800;
   color: #2b1103;
   letter-spacing: 1.5px;
@@ -923,8 +916,8 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 /* 2. Header Labels on Beige Ribbons */
 .result-card-banner {
   position: absolute;
-  top: 53.8%;
-  height: 5.6%;
+  top: 53.5%;
+  height: 5.8%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -936,23 +929,25 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   letter-spacing: 0.5px;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
   pointer-events: none;
+  white-space: nowrap !important;
+  line-height: 1 !important;
 }
 
 .result-banner-clock {
-  left: 29.7%;
-  width: 14.6%;
+  left: 28.5%;
+  width: 15.0%;
   animation: slotPop 0.5s 0.2s var(--ease-spring) both;
 }
 
 .result-banner-speedo {
-  left: 45.6%;
-  width: 16.0%;
+  left: 46.0%;
+  width: 15.0%;
   animation: slotPop 0.5s 0.3s var(--ease-spring) both;
 }
 
 .result-banner-medal {
-  left: 64.5%;
-  width: 14.8%;
+  left: 64.2%;
+  width: 15.0%;
   animation: slotPop 0.5s 0.4s var(--ease-spring) both;
 }
 
@@ -960,7 +955,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 .result-card-val {
   position: absolute;
   top: 60.5%;
-  height: 9.5%;
+  height: 8.8%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -973,24 +968,24 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 .result-val-clock {
-  left: 29.7%;
-  width: 14.6%;
+  left: 27.5%;
+  width: 17.0%;
   flex-direction: column;
   animation: slotPop 0.5s 0.25s var(--ease-spring) both;
 }
 
 .result-time-num {
   font-family: var(--font-game);
-  font-size: clamp(24px, 2.6vw, 42px);
+  font-size: clamp(16px, 2.2vw, 36px);
   font-weight: 800;
   color: #1e1309;
-  line-height: 1.05;
+  line-height: 1;
   letter-spacing: 0.5px;
 }
 
 .result-time-unit {
   font-family: var(--font-game);
-  font-size: clamp(10px, 0.9vw, 13px);
+  font-size: clamp(8.5px, 0.8vw, 12px);
   font-weight: 700;
   color: #6d4224;
   line-height: 1;
@@ -998,33 +993,37 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 .result-val-speedo {
-  left: 45.6%;
-  width: 16.0%;
+  left: 45.0%;
+  width: 17.0%;
   animation: slotPop 0.5s 0.35s var(--ease-spring) both;
 }
 
 .result-category-text {
   font-family: var(--font-game);
-  font-size: clamp(18px, 1.95vw, 32px);
+  font-size: clamp(12px, 1.55vw, 24px);
   font-weight: 800;
   color: #2a1204;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
   letter-spacing: 0.3px;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .result-val-medal {
-  left: 64.5%;
-  width: 14.8%;
+  left: 63.2%;
+  width: 17.0%;
   animation: slotPop 0.5s 0.45s var(--ease-spring) both;
 }
 
 .result-predicate-text {
   font-family: var(--font-game);
-  font-size: clamp(15px, 1.65vw, 25px);
+  font-size: clamp(10.5px, 1.3vw, 19px);
   font-weight: 800;
   color: #073b22;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 @keyframes slotPop {
@@ -1032,11 +1031,50 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* Media queries moved below base button classes for proper CSS cascade */
+
+/* Fullscreen Fit to Screen (Maintain 16:9 Letterbox without stretching) */
+:fullscreen {
+  background-color: #000000 !important;
+}
+:-webkit-full-screen {
+  background-color: #000000 !important;
+}
+:fullscreen body {
+  background-color: #000000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+:-webkit-full-screen body {
+  background-color: #000000 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Simulated Fullscreen Fallback */
+body.fullscreen-simulated {
+  background-color: #000000 !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
 /* 4. Bottom Wooden Action Buttons - Resting cleanly on the desk table */
 .result-wood-actions {
   position: absolute;
   top: 84.5%;
-  left: 51.5%;
+  left: 53.5%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -1111,6 +1149,114 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   100% { transform: translate(-50%, 0); opacity: 1; }
 }
 
+/* Responsive Adaptations for Endscreen on Tablets and Mobile Phones */
+@media (max-width: 900px) {
+  .result-player-title {
+    gap: 6px;
+  }
+  .title-prefix {
+    font-size: clamp(12px, 1.8vw, 18px);
+  }
+  .title-name {
+    font-size: clamp(18px, 2.8vw, 28px);
+  }
+  .result-card-banner {
+    font-size: clamp(8.5px, 1.2vw, 13px);
+    white-space: nowrap !important;
+    line-height: 1 !important;
+  }
+  .result-time-num {
+    font-size: clamp(13px, 1.9vw, 22px);
+  }
+  .result-time-unit {
+    font-size: clamp(7px, 0.75vw, 9.5px);
+  }
+  .result-category-text {
+    font-size: clamp(9.5px, 1.3vw, 15px);
+    white-space: nowrap !important;
+  }
+  .result-predicate-text {
+    font-size: clamp(8.5px, 1.1vw, 13px);
+    white-space: nowrap !important;
+  }
+  .result-wood-actions {
+    top: 84.0% !important;
+    left: 53.5% !important;
+    transform: translateX(-50%) !important;
+    gap: 6px !important;
+  }
+  .wood-action-btn {
+    padding: 5px 10px 5px 6px !important;
+    font-size: clamp(9.5px, 1.0vw, 12px) !important;
+    border-width: 2px !important;
+  }
+  .wood-icon-bubble {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 600px), (orientation: portrait) {
+  .result-player-title {
+    gap: 4px;
+  }
+  .title-prefix {
+    font-size: clamp(9px, 2.2vw, 13px);
+  }
+  .title-name {
+    font-size: clamp(13px, 3.4vw, 18px);
+    letter-spacing: 0.8px;
+  }
+  .result-card-banner {
+    font-size: clamp(6.5px, 1.6vw, 9.5px);
+    white-space: nowrap !important;
+    line-height: 1 !important;
+  }
+  .result-time-num {
+    font-size: clamp(10px, 2.5vw, 15px);
+    line-height: 1;
+  }
+  .result-time-unit {
+    font-size: clamp(5.5px, 1.3vw, 7.5px);
+    line-height: 1;
+    margin-top: 1px;
+  }
+  .result-category-text {
+    font-size: clamp(7px, 1.8vw, 10.5px);
+    white-space: nowrap !important;
+    line-height: 1;
+  }
+  .result-predicate-text {
+    font-size: clamp(6px, 1.55vw, 9.5px);
+    white-space: nowrap !important;
+    line-height: 1;
+  }
+  .result-wood-actions {
+    top: 84.5% !important;
+    left: 53.5% !important;
+    transform: translateX(-50%) !important;
+    gap: 3px !important;
+    width: max-content !important;
+    max-width: 98% !important;
+  }
+  .wood-action-btn {
+    padding: 3px 6px 3px 4px !important;
+    font-size: clamp(7.5px, 1.8vw, 10px) !important;
+    border-width: 1.5px !important;
+    gap: 3px !important;
+  }
+  .wood-icon-bubble {
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 9px !important;
+    border-width: 1px !important;
+  }
+  .wood-text {
+    white-space: nowrap !important;
+  }
+}
+
 /* ==========================================================================
    MODAL WINDOWS (LEADERBOARD & CERTIFICATE)
    ========================================================================== */
@@ -1121,18 +1267,19 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   z-index: 10000;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   padding: 20px;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: none !important;
   transition: opacity 0.3s var(--ease-smooth);
 }
 
 .detective-modal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .detective-modal-card {
@@ -1158,6 +1305,113 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .detective-modal-backdrop.active .detective-modal-card {
   transform: translateY(0) scale(1);
+}
+
+/* Custom Confirmation Modal for Leaderboard Clear */
+.confirm-clear-backdrop {
+  z-index: 20000 !important;
+  background: rgba(5, 10, 18, 0.88) !important;
+}
+
+.confirm-modal-card {
+  max-width: 440px !important;
+  text-align: center;
+  padding: 30px 24px 26px !important;
+  border: 4px solid #f59e0b !important;
+  box-shadow: 
+    0 25px 60px rgba(0, 0, 0, 0.95),
+    0 0 40px rgba(245, 158, 11, 0.35) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.confirm-modal-icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+  line-height: 1;
+  animation: pulseIcon 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.confirm-modal-title {
+  font-family: var(--font-game) !important;
+  font-size: clamp(20px, 2.2vw, 26px) !important;
+  font-weight: 800 !important;
+  color: #ffeedd !important;
+  margin: 0 0 12px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.confirm-modal-desc {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14.5px !important;
+  color: #cbd5e1 !important;
+  line-height: 1.55 !important;
+  margin: 0 0 24px !important;
+}
+
+.confirm-modal-actions {
+  display: flex !important;
+  gap: 14px !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.confirm-btn {
+  font-family: var(--font-game) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  padding: 10px 24px !important;
+  border-radius: 999px !important;
+  cursor: pointer !important;
+  border: none !important;
+  transition: all 0.2s var(--ease-spring) !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+  letter-spacing: 0.5px !important;
+}
+
+.confirm-btn-cancel {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+  border: 2px solid #64748b !important;
+}
+
+.confirm-btn-cancel:hover {
+  background: #475569 !important;
+  transform: translateY(-2px) !important;
+}
+
+.confirm-btn-danger {
+  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  border: 2.5px solid #fca5a5 !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4) !important;
+}
+
+.confirm-btn-danger:hover {
+  filter: brightness(1.15) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Detective Name Input on 'identitas pengguna' */
+.c2-input-name {
+  font-family: var(--font-game), cursive, sans-serif !important;
+  font-weight: 800 !important;
+  font-size: clamp(24px, 3.2vw, 44px) !important;
+  color: #3a1c07 !important;
+  caret-color: #8b5a2b !important;
+  letter-spacing: 1.5px !important;
+}
+
+@media (max-width: 600px), (orientation: portrait) {
+  .c2-input-name {
+    font-size: clamp(18px, 4.2vw, 24px) !important;
+  }
 }
 
 .modal-header {

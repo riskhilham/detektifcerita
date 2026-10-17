@@ -35,6 +35,8 @@
     currentResult: null,
     completedMissions: {},
     alertAutoTimer: null,
+    misiBgm: null,
+    isMissionBgmPlaying: false,
 
     // Audio elements
     sounds: {
@@ -94,6 +96,88 @@
       } catch (e) {}
     },
 
+    // =========================================================================
+    // MISSION BGM SYSTEM ('media/bgm_misi.ogg')
+    // Automatically loops during Missions 1 to 10 and stops on menu / endscreen
+    // Respects in-game mute toggle (C2 'backsound' variable)
+    // =========================================================================
+    playMisiBgm: function () {
+      this.isMissionBgmPlaying = true;
+      this.stopC2Bgm();
+
+      if (!this.misiBgm) {
+        this.misiBgm = new Audio('media/bgm_misi.ogg');
+        this.misiBgm.loop = true;
+      }
+
+      var isMuted = (this.getC2Var('backsound') === 1);
+      this.misiBgm.muted = isMuted;
+      this.misiBgm.volume = isMuted ? 0 : 0.6;
+
+      if (this.misiBgm.paused) {
+        var p = this.misiBgm.play();
+        if (p && p.catch) p.catch(function () {});
+      }
+    },
+
+    stopMisiBgm: function () {
+      this.isMissionBgmPlaying = false;
+      if (this.misiBgm) {
+        try {
+          this.misiBgm.pause();
+          this.misiBgm.currentTime = 0;
+        } catch (e) {}
+      }
+    },
+
+    stopC2Bgm: function () {
+      try {
+        var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+        if (rt && rt.types_by_index) {
+          for (var i = 0; i < rt.types_by_index.length; i++) {
+            var t = rt.types_by_index[i];
+            if (t && t.plugin && window.cr && window.cr.plugins_ && t.plugin instanceof window.cr.plugins_.Audio) {
+              if (t.instances && t.instances[0]) {
+                window.cr.plugins_.Audio.prototype.acts.SetPaused.call(t.instances[0], "bgm", 0);
+              }
+            }
+          }
+        }
+      } catch (e) {}
+      var allAudios = document.querySelectorAll('audio');
+      for (var a = 0; a < allAudios.length; a++) {
+        if (allAudios[a] !== this.misiBgm && allAudios[a].src && allAudios[a].src.indexOf('fix,bgm') !== -1) {
+          try { allAudios[a].pause(); } catch (e) {}
+        }
+      }
+    },
+
+    resumeC2Bgm: function () {
+      var isMuted = (this.getC2Var('backsound') === 1);
+      if (isMuted) return;
+      try {
+        var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+        if (rt && rt.types_by_index) {
+          for (var i = 0; i < rt.types_by_index.length; i++) {
+            var t = rt.types_by_index[i];
+            if (t && t.plugin && window.cr && window.cr.plugins_ && t.plugin instanceof window.cr.plugins_.Audio) {
+              if (t.instances && t.instances[0]) {
+                window.cr.plugins_.Audio.prototype.acts.SetPaused.call(t.instances[0], "bgm", 1);
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    },
+
+    syncBgmVolume: function () {
+      if (this.misiBgm) {
+        var isMuted = (this.getC2Var('backsound') === 1);
+        this.misiBgm.muted = isMuted;
+        this.misiBgm.volume = isMuted ? 0 : 0.6;
+      }
+    },
+
     // LocalStorage management
     loadHistory: function () {
       try {
@@ -140,6 +224,9 @@
           } else {
             self.elapsedSeconds = Math.floor((Date.now() - self.startTime) / 1000);
           }
+        }
+        if (self.isMissionBgmPlaying) {
+          self.syncBgmVolume();
         }
       }, 500);
       console.log('⏱️ Game Timer Started');
@@ -266,6 +353,11 @@
       var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
       if (!rt) return;
 
+      var self = this;
+      if (name && name.toLowerCase() === 'backsound') {
+        setTimeout(function () { self.syncBgmVolume(); }, 50);
+      }
+
       if (rt.all_global_vars) {
         for (var i = 0; i < rt.all_global_vars.length; i++) {
           if (rt.all_global_vars[i].name && rt.all_global_vars[i].name.toLowerCase() === name.toLowerCase()) {
@@ -298,6 +390,8 @@
         var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
         if (rt && rt.doChangeLayout) {
           clearInterval(checkC2);
+          rt.fullscreen_mode = 4;
+          rt.fullscreen_scaling = 4;
           self.attachRuntimeHooks(rt);
         }
       }, 50);
@@ -308,7 +402,33 @@
       var proto = Object.getPrototypeOf(rt);
       if (proto._detektifHooked) return;
       proto._detektifHooked = true;
+      rt.fullscreen_mode = 4;
+      rt.fullscreen_scaling = 4;
       var origDoChangeLayout = proto.doChangeLayout;
+
+      // Hook C2 Audio plugin to prevent C2 from playing default bgm during missions
+      try {
+        if (window.cr && window.cr.plugins_ && window.cr.plugins_.Audio) {
+          var audioProto = window.cr.plugins_.Audio.prototype;
+          if (audioProto && audioProto.acts && !audioProto.acts._detektifAudioHooked) {
+            audioProto.acts._detektifAudioHooked = true;
+            var origPlay = audioProto.acts.Play;
+            audioProto.acts.Play = function (file, looping, vol, tag) {
+              if (self.isMissionBgmPlaying && tag === 'bgm') {
+                return; // Suppress default menu BGM while on missions
+              }
+              return origPlay.apply(this, arguments);
+            };
+
+            var origSetMuted = audioProto.acts.SetMuted;
+            audioProto.acts.SetMuted = function (tag, muted) {
+              var res = origSetMuted.apply(this, arguments);
+              self.syncBgmVolume();
+              return res;
+            };
+          }
+        }
+      } catch (e) {}
 
       proto.doChangeLayout = function (changeToLayout) {
         var fromLayout = this.running_layout ? this.running_layout.name : '';
@@ -448,6 +568,34 @@
               return res;
             };
           }
+
+          var touchInstProto = window.cr.plugins_.Touch.prototype.Instance.prototype;
+          if (touchInstProto && !touchInstProto._detektifTouchLogged) {
+            touchInstProto._detektifTouchLogged = true;
+            var origOnTouchStart = touchInstProto.onTouchStart;
+            touchInstProto.onTouchStart = function (info) {
+              if (info && info.changedTouches) {
+                for (var k = 0; k < info.changedTouches.length; k++) {
+                  var tid = info.changedTouches[k]["identifier"];
+                  var existingIdx = this.findTouch(tid);
+                  if (existingIdx !== -1) {
+                    this.touches.splice(existingIdx, 1);
+                  }
+                }
+              }
+              return origOnTouchStart.apply(this, arguments);
+            };
+
+            var origOnMouseDown = touchInstProto.onMouseDown;
+            touchInstProto.onMouseDown = function (info) {
+              var existingIdx = this.findTouch(0);
+              if (existingIdx !== -1) {
+                this.touches.splice(existingIdx, 1);
+              }
+              this.mouseDown = false;
+              return origOnMouseDown.apply(this, arguments);
+            };
+          }
         }
 
         if (window.cr && window.cr.plugins_ && window.cr.plugins_.Mouse) {
@@ -462,6 +610,31 @@
             };
           }
         }
+
+        window.addEventListener('mouseup', function (e) {
+          if (window.cr_getC2Runtime) {
+            try {
+              var rt = window.cr_getC2Runtime();
+              if (rt && rt.types_by_index) {
+                for (var ti = 0; ti < rt.types_by_index.length; ti++) {
+                  var tObj = rt.types_by_index[ti];
+                  if (tObj && tObj.instances) {
+                    for (var ii = 0; ii < tObj.instances.length; ii++) {
+                      var inst = tObj.instances[ii];
+                      if (inst && inst.touches) {
+                        var mIdx = inst.findTouch(0);
+                        if (mIdx !== -1) {
+                          inst.touches.splice(mIdx, 1);
+                        }
+                        inst.mouseDown = false;
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (err) {}
+          }
+        }, true);
       } catch (e) {}
 
       console.log('🔒 Construct 2 Lifecycle & Layout Guards Active');
@@ -497,6 +670,31 @@
     onLayoutChanged: function (layoutName) {
       this.currentLayoutName = layoutName;
       this.removeHasilAkhirOverlay();
+      this.closeGameAlert();
+      this.closeModal('leaderboard-modal');
+      this.closeModal('certificate-modal');
+
+      // Clear any stuck touches from Touch plugin across layout switches
+      if (window.cr_getC2Runtime) {
+        try {
+          var rt = window.cr_getC2Runtime();
+          if (rt && rt.types_by_index) {
+            for (var ti = 0; ti < rt.types_by_index.length; ti++) {
+              var tObj = rt.types_by_index[ti];
+              if (tObj && tObj.instances) {
+                for (var ii = 0; ii < tObj.instances.length; ii++) {
+                  var inst = tObj.instances[ii];
+                  if (inst && inst.touches) {
+                    inst.touches.length = 0;
+                    inst.mouseDown = false;
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
       if (this.updateHUDLayout) this.updateHUDLayout();
 
       var playerHud = document.getElementById('game-hud-player');
@@ -508,16 +706,29 @@
         actionsHud = document.getElementById('game-hud-actions');
       }
 
-      var isGameplay = (layoutName.indexOf('misi') === 0 || 
+      var isGameplay = (layoutName.indexOf('misi ') === 0 || 
                         layoutName.indexOf('jawaban pg') === 0 || 
                         layoutName.indexOf('pilihan ganda') === 0 ||
-                        layoutName.indexOf('petunjuk') === 0);
+                        layoutName.indexOf('feedback') === 0);
       var isMainMenu = (layoutName === 'main menu' || layoutName === 'main menu 2');
       var isResults = (layoutName === 'hasil akhir');
+      var isPetunjuk = (layoutName.indexOf('petunjuk') === 0);
       var isHiddenScreen = (layoutName === 'loading' || 
                             layoutName === 'loading+judul' || 
                             layoutName === 'identitas pengguna' || 
                             layoutName.indexOf('video') === 0);
+
+      // 3. Audio Router: Mission BGM ('media/bgm_misi.ogg') vs Default Menu BGM
+      if (isGameplay) {
+        this.playMisiBgm();
+      } else {
+        if (this.isMissionBgmPlaying) {
+          this.stopMisiBgm();
+        }
+        if (isMainMenu) {
+          this.resumeC2Bgm();
+        }
+      }
 
       if (isResults || isHiddenScreen) {
         if (playerHud) playerHud.style.display = 'none';
@@ -534,12 +745,6 @@
         if (actionsHud) {
           actionsHud.style.display = 'flex';
           actionsHud.classList.add('hud-no-scoreboard');
-          var isUrutanAlur = (layoutName === 'misi 7' || layoutName === 'misi 8' || layoutName === 'misi 9' || layoutName === 'misi 10');
-          if (isUrutanAlur) {
-            actionsHud.classList.add('hud-shift-misi-alur');
-          } else {
-            actionsHud.classList.remove('hud-shift-misi-alur');
-          }
         }
         // Nama Pemain di pojok kiri bawah: DIPERTAHANKAN saat misi berlangsung
         if (playerHud) {
@@ -555,9 +760,18 @@
         if (actionsHud) {
           actionsHud.style.display = 'flex';
           actionsHud.classList.remove('hud-no-scoreboard');
-          actionsHud.classList.remove('hud-shift-misi-alur');
         }
         // Di Beranda: Sembunyikan badge nama karena pemain belum mengisi identitas
+        if (playerHud) {
+          playerHud.style.display = 'none';
+        }
+      } else if (isPetunjuk) {
+        // 1 & 2: Halaman Petunjuk Tombol & Petunjuk Permainan:
+        // HILANGKAN TOMBOL NAMA dan HILANGKAN TOMBOL PAPAN SKOR (Hanya tombol Fullscreen jika ada)
+        if (actionsHud) {
+          actionsHud.style.display = 'flex';
+          actionsHud.classList.add('hud-no-scoreboard');
+        }
         if (playerHud) {
           playerHud.style.display = 'none';
         }
@@ -657,11 +871,11 @@
           input.style.setProperty('letter-spacing', '1.5px', 'important');
 
           if (isMobile) {
-            input.style.setProperty('font-size', 'clamp(14px, 3.5vw, 18px)', 'important');
+            input.style.setProperty('font-size', 'clamp(18px, 4.2vw, 24px)', 'important');
             input.style.setProperty('padding', '2px 10px 2px 12px', 'important');
             input.style.setProperty('line-height', 'normal', 'important');
           } else {
-            input.style.setProperty('font-size', 'clamp(20px, 2.7vw, 38px)', 'important');
+            input.style.setProperty('font-size', 'clamp(24px, 3.2vw, 44px)', 'important');
             input.style.setProperty('padding', '4px 16px 4px clamp(14px, 1.8vw, 24px)', 'important');
           }
 
@@ -758,6 +972,7 @@
       var modal = document.createElement('div');
       modal.id = 'game-alert-modal';
       modal.className = 'game-alert-modal-backdrop';
+      modal.style.display = 'none';
       modal.innerHTML =
         '<div class="game-alert-modal-card" id="game-alert-card">' +
           '<button class="alert-modal-close" id="btn-close-alert" title="Tutup">✕</button>' +
@@ -818,6 +1033,7 @@
       document.getElementById('alert-modal-content').innerHTML = opts.body || '';
       document.getElementById('alert-modal-btn-text').textContent = opts.btnText || 'Siap, Lanjutkan!';
 
+      modal.style.display = 'flex';
       modal.classList.add('active');
       this.playSound(opts.sound || 'warning');
 
@@ -831,7 +1047,10 @@
     closeGameAlert: function () {
       if (this.alertAutoTimer) clearTimeout(this.alertAutoTimer);
       var modal = document.getElementById('game-alert-modal');
-      if (modal) modal.classList.remove('active');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
     },
 
     triggerMissionWarning: function (missionName, current, target) {
@@ -1101,13 +1320,32 @@
       container.appendChild(actionsHud);
 
       var self = this;
-      document.getElementById('hud-btn-lb').onclick = function () {
-        self.playSound('click');
-        self.openModal('leaderboard-modal');
-      };
-      document.getElementById('hud-btn-fs').onclick = function () {
-        self.toggleFullscreen();
-      };
+      var btnLb = document.getElementById('hud-btn-lb');
+      if (btnLb) {
+        var triggerLb = function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          self.playSound('click');
+          self.openModal('leaderboard-modal');
+        };
+        btnLb.onclick = triggerLb;
+      }
+
+      var btnFs = document.getElementById('hud-btn-fs');
+      if (btnFs) {
+        var triggerFs = function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          self.playSound('click');
+          self.toggleFullscreen();
+        };
+        btnFs.onclick = triggerFs;
+        btnFs.addEventListener('touchend', triggerFs, { passive: false });
+      }
 
       this.updateHUDPlayer();
     },
@@ -1121,10 +1359,107 @@
     },
 
     toggleFullscreen: function () {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(function () {});
+      var self = this;
+      var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+      var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      var isSimulated = document.body.classList.contains('fullscreen-simulated');
+
+      var updateFsIcon = function (active) {
+        var fsBtn = document.getElementById('hud-btn-fs');
+        if (fsBtn) {
+          fsBtn.innerHTML = active ? '<span class="hud-fs-icon">🗗</span>' : '<span class="hud-fs-icon">⛶</span>';
+          fsBtn.title = active ? 'Keluar Layar Penuh' : 'Layar Penuh';
+        }
+      };
+
+      if (!isFs && !isSimulated) {
+        var el = document.documentElement || document.body;
+        var rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+        var handled = false;
+        if (rfs) {
+          try {
+            var promise = rfs.call(el);
+            if (promise && typeof promise.then === 'function') {
+              handled = true;
+              promise.then(function () {
+                updateFsIcon(true);
+                if (rt && rt.setSize) {
+                  rt.fullscreen_mode = 4;
+                  rt.fullscreen_scaling = 4;
+                  setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
+                  setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 250);
+                }
+              }).catch(function (err) {
+                console.warn('Native fullscreen rejected, using fallback:', err);
+                self.toggleSimulatedFullscreen(true);
+                updateFsIcon(true);
+              });
+            } else {
+              handled = true;
+              updateFsIcon(true);
+              if (rt && rt.setSize) {
+                rt.fullscreen_mode = 4;
+                rt.fullscreen_scaling = 4;
+                setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
+                setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 250);
+              }
+            }
+          } catch (e) {
+            console.warn('Native requestFullscreen failed:', e);
+          }
+        }
+        if (!handled) {
+          self.toggleSimulatedFullscreen(true);
+          updateFsIcon(true);
+        }
       } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+        if (isFs) {
+          var efs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+          if (efs) {
+            try {
+              var exitPromise = efs.call(document);
+              if (exitPromise && typeof exitPromise.then === 'function') {
+                exitPromise.then(function () {
+                  updateFsIcon(false);
+                  if (rt && rt.setSize) {
+                    setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
+                  }
+                }).catch(function () {});
+              } else {
+                updateFsIcon(false);
+                if (rt && rt.setSize) {
+                  setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
+                }
+              }
+            } catch (e) {}
+          }
+        }
+        if (isSimulated) {
+          self.toggleSimulatedFullscreen(false);
+          updateFsIcon(false);
+        }
+      }
+    },
+
+    toggleSimulatedFullscreen: function (enable) {
+      var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+      if (enable) {
+        document.body.classList.add('fullscreen-simulated');
+      } else {
+        document.body.classList.remove('fullscreen-simulated');
+      }
+      if (rt && rt.setSize) {
+        rt.fullscreen_mode = 4;
+        rt.fullscreen_scaling = 4;
+        setTimeout(function () {
+          rt.setSize(window.innerWidth, window.innerHeight, true);
+        }, 60);
+        setTimeout(function () {
+          rt.setSize(window.innerWidth, window.innerHeight, true);
+        }, 220);
+      }
+      if (this.updateHUDLayout) {
+        this.updateHUDLayout();
       }
     },
 
@@ -1158,6 +1493,13 @@
             el.classList.remove('hud-mobile');
           }
         });
+
+        // Ensure C2 maintains letterbox fit in fullscreen or resize
+        var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+        if (rt && (document.fullscreenElement || document.webkitFullscreenElement)) {
+          rt.fullscreen_mode = 4;
+          rt.fullscreen_scaling = 4;
+        }
       };
 
       window.addEventListener('resize', this.updateHUDLayout, { passive: true });
@@ -1165,8 +1507,24 @@
         setTimeout(self.updateHUDLayout, 100);
         setTimeout(self.updateHUDLayout, 300);
       });
-      document.addEventListener('fullscreenchange', function () {
-        setTimeout(self.updateHUDLayout, 100);
+      var fsEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+      fsEvents.forEach(function (ev) {
+        document.addEventListener(ev, function () {
+          var isNowFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+          var fsBtn = document.getElementById('hud-btn-fs');
+          if (fsBtn) {
+            fsBtn.innerHTML = isNowFs ? '<span class="hud-fs-icon">🗗</span>' : '<span class="hud-fs-icon">⛶</span>';
+            fsBtn.title = isNowFs ? 'Keluar Layar Penuh' : 'Layar Penuh';
+          }
+          var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
+          if (rt && rt.setSize) {
+            rt.fullscreen_mode = 4;
+            rt.fullscreen_scaling = 4;
+            rt.setSize(window.innerWidth, window.innerHeight, true);
+          }
+          setTimeout(self.updateHUDLayout, 100);
+          setTimeout(self.updateHUDLayout, 300);
+        });
       });
 
       this.updateHUDLayout();
@@ -1184,6 +1542,7 @@
       var lbModal = document.createElement('div');
       lbModal.id = 'leaderboard-modal';
       lbModal.className = 'detective-modal-backdrop';
+      lbModal.style.display = 'none';
       lbModal.innerHTML =
         '<div class="detective-modal-card">' +
           '<div class="modal-header">' +
@@ -1198,6 +1557,7 @@
       var certModal = document.createElement('div');
       certModal.id = 'certificate-modal';
       certModal.className = 'detective-modal-backdrop';
+      certModal.style.display = 'none';
       certModal.innerHTML =
         '<div class="detective-modal-card">' +
           '<div class="modal-header">' +
@@ -1248,12 +1608,18 @@
         this.renderCertificate();
       }
       var el = document.getElementById(id);
-      if (el) el.classList.add('active');
+      if (el) {
+        el.style.display = 'flex';
+        el.classList.add('active');
+      }
     },
 
     closeModal: function (id) {
       var el = document.getElementById(id);
-      if (el) el.classList.remove('active');
+      if (el) {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      }
     },
 
     renderLeaderboard: function () {
@@ -1312,14 +1678,73 @@
       var self = this;
       var clearBtn = document.getElementById('btn-clear-lb');
       if (clearBtn) {
-        clearBtn.onclick = function () {
-          if (confirm('Yakin ingin mereset seluruh riwayat permainan?')) {
-            self.history = [];
-            localStorage.removeItem('detektif_cerita_history');
-            self.renderLeaderboard();
+        clearBtn.onclick = function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
           }
+          self.playSound('click');
+          self.showClearConfirmDialog();
         };
       }
+    },
+
+    showClearConfirmDialog: function () {
+      var self = this;
+      var existing = document.getElementById('confirm-clear-modal');
+      if (existing) {
+        existing.remove();
+      }
+
+      var modal = document.createElement('div');
+      modal.id = 'confirm-clear-modal';
+      modal.className = 'detective-modal-backdrop confirm-clear-backdrop';
+      modal.innerHTML =
+        '<div class="detective-modal-card confirm-modal-card">' +
+          '<div class="confirm-modal-icon">⚠️</div>' +
+          '<h3 class="confirm-modal-title">Hapus Riwayat Detektif?</h3>' +
+          '<p class="confirm-modal-desc">Seluruh data riwayat permainan, rekor waktu, dan peringkat yang tersimpan akan dihapus secara permanen. Apakah kamu yakin?</p>' +
+          '<div class="confirm-modal-actions">' +
+            '<button class="confirm-btn confirm-btn-cancel" id="btn-cancel-clear">Batal</button>' +
+            '<button class="confirm-btn confirm-btn-danger" id="btn-action-clear">Ya, Hapus</button>' +
+          '</div>' +
+        '</div>';
+
+      document.body.appendChild(modal);
+
+      var closeModal = function () {
+        modal.classList.remove('active');
+        setTimeout(function () {
+          if (modal.parentNode) modal.parentNode.removeChild(modal);
+        }, 220);
+      };
+
+      document.getElementById('btn-cancel-clear').onclick = function (e) {
+        if (e) e.preventDefault();
+        self.playSound('click');
+        closeModal();
+      };
+
+      document.getElementById('btn-action-clear').onclick = function (e) {
+        if (e) e.preventDefault();
+        self.playSound('success');
+        self.history = [];
+        try {
+          localStorage.removeItem('detektif_cerita_history');
+        } catch (err) {}
+        closeModal();
+        self.renderLeaderboard();
+      };
+
+      modal.onclick = function (e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      };
+
+      setTimeout(function () {
+        modal.classList.add('active');
+      }, 10);
     },
 
     renderCertificate: function () {
