@@ -954,8 +954,8 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 /* 3. Inner Values inside Pre-Drawn Colored Boxes */
 .result-card-val {
   position: absolute;
-  top: 60.2%;
-  height: 8.0%;
+  top: 58.8%;
+  height: 8.8%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -976,7 +976,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .result-time-num {
   font-family: var(--font-game);
-  font-size: clamp(14px, calc(var(--game-ch, 720px) * 0.038), 34px);
+  font-size: clamp(16px, calc(var(--game-ch, 720px) * 0.045), 40px);
   font-weight: 800;
   color: #1e1309;
   line-height: 1;
@@ -985,11 +985,11 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .result-time-unit {
   font-family: var(--font-game);
-  font-size: clamp(8px, calc(var(--game-ch, 720px) * 0.016), 14px);
+  font-size: clamp(9px, calc(var(--game-ch, 720px) * 0.019), 16px);
   font-weight: 700;
   color: #6d4224;
   line-height: 1;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .result-val-speedo {
@@ -1000,7 +1000,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .result-category-text {
   font-family: var(--font-game);
-  font-size: clamp(11px, calc(var(--game-ch, 720px) * 0.026), 24px);
+  font-size: clamp(13px, calc(var(--game-ch, 720px) * 0.034), 30px);
   font-weight: 800;
   color: #2a1204;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
@@ -1017,7 +1017,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .result-predicate-text {
   font-family: var(--font-game);
-  font-size: clamp(10px, calc(var(--game-ch, 720px) * 0.024), 22px);
+  font-size: clamp(12px, calc(var(--game-ch, 720px) * 0.030), 26px);
   font-weight: 800;
   color: #073b22;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
@@ -1217,7 +1217,6 @@ body.fullscreen-simulated {
     font-size: 9px !important;
     border-width: 1px !important;
   }
-}
   .wood-text {
     white-space: nowrap !important;
   }
