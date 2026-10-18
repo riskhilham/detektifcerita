@@ -875,10 +875,10 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 /* 1. Top Scalloped Box - Player Name */
 .result-slot-name {
   position: absolute;
-  top: 26.5%;
-  left: 25.5%;
-  width: 56.0%;
-  height: 16.5%;
+  top: 28.2%;
+  left: 24.5%;
+  width: 58.0%;
+  height: 14.5%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -890,22 +890,22 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: clamp(6px, 1.0vw, 14px);
   font-family: var(--font-game);
 }
 
 .title-prefix {
   font-family: var(--font-game);
-  font-size: clamp(18px, 2.0vw, 32px);
+  font-size: clamp(14px, calc(var(--game-ch, 720px) * 0.032), 30px);
   font-weight: 700;
   color: #7d441c;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
 .title-name {
   font-family: var(--font-game);
-  font-size: clamp(28px, 3.6vw, 54px);
+  font-size: clamp(22px, calc(var(--game-ch, 720px) * 0.052), 48px);
   font-weight: 800;
   color: #2b1103;
   letter-spacing: 1.5px;
@@ -916,13 +916,13 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 /* 2. Header Labels on Beige Ribbons */
 .result-card-banner {
   position: absolute;
-  top: 53.5%;
-  height: 5.8%;
+  top: 53.8%;
+  height: 5.0%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-game);
-  font-size: clamp(12px, 1.25vw, 18px);
+  font-size: clamp(9px, calc(var(--game-ch, 720px) * 0.021), 18px);
   font-weight: 700;
   color: #4a240c;
   text-align: center;
@@ -934,28 +934,28 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 .result-banner-clock {
-  left: 28.5%;
-  width: 15.0%;
+  left: 27.5%;
+  width: 15.3%;
   animation: slotPop 0.5s 0.2s var(--ease-spring) both;
 }
 
 .result-banner-speedo {
-  left: 46.0%;
-  width: 15.0%;
+  left: 45.7%;
+  width: 15.4%;
   animation: slotPop 0.5s 0.3s var(--ease-spring) both;
 }
 
 .result-banner-medal {
-  left: 64.2%;
-  width: 15.0%;
+  left: 64.0%;
+  width: 15.4%;
   animation: slotPop 0.5s 0.4s var(--ease-spring) both;
 }
 
 /* 3. Inner Values inside Pre-Drawn Colored Boxes */
 .result-card-val {
   position: absolute;
-  top: 60.5%;
-  height: 8.8%;
+  top: 60.2%;
+  height: 8.0%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -968,15 +968,15 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 .result-val-clock {
-  left: 27.5%;
-  width: 17.0%;
+  left: 27.0%;
+  width: 16.3%;
   flex-direction: column;
   animation: slotPop 0.5s 0.25s var(--ease-spring) both;
 }
 
 .result-time-num {
   font-family: var(--font-game);
-  font-size: clamp(16px, 2.2vw, 36px);
+  font-size: clamp(14px, calc(var(--game-ch, 720px) * 0.038), 34px);
   font-weight: 800;
   color: #1e1309;
   line-height: 1;
@@ -985,7 +985,7 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 
 .result-time-unit {
   font-family: var(--font-game);
-  font-size: clamp(8.5px, 0.8vw, 12px);
+  font-size: clamp(8px, calc(var(--game-ch, 720px) * 0.016), 14px);
   font-weight: 700;
   color: #6d4224;
   line-height: 1;
@@ -993,14 +993,14 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 .result-val-speedo {
-  left: 45.0%;
-  width: 17.0%;
+  left: 45.2%;
+  width: 16.4%;
   animation: slotPop 0.5s 0.35s var(--ease-spring) both;
 }
 
 .result-category-text {
   font-family: var(--font-game);
-  font-size: clamp(12px, 1.55vw, 24px);
+  font-size: clamp(11px, calc(var(--game-ch, 720px) * 0.026), 24px);
   font-weight: 800;
   color: #2a1204;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
@@ -1010,14 +1010,14 @@ body.hud-portrait #c2canvasdiv .hud-fs-icon {
 }
 
 .result-val-medal {
-  left: 63.2%;
-  width: 17.0%;
+  left: 63.5%;
+  width: 16.4%;
   animation: slotPop 0.5s 0.45s var(--ease-spring) both;
 }
 
 .result-predicate-text {
   font-family: var(--font-game);
-  font-size: clamp(10.5px, 1.3vw, 19px);
+  font-size: clamp(10px, calc(var(--game-ch, 720px) * 0.024), 22px);
   font-weight: 800;
   color: #073b22;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
@@ -1154,46 +1154,32 @@ body.fullscreen-simulated {
   .result-player-title {
     gap: 6px;
   }
-  .title-prefix {
-    font-size: clamp(12px, 1.8vw, 18px);
-  }
-  .title-name {
-    font-size: clamp(18px, 2.8vw, 28px);
-  }
   .result-card-banner {
-    font-size: clamp(8.5px, 1.2vw, 13px);
     white-space: nowrap !important;
     line-height: 1 !important;
   }
-  .result-time-num {
-    font-size: clamp(13px, 1.9vw, 22px);
-  }
-  .result-time-unit {
-    font-size: clamp(7px, 0.75vw, 9.5px);
-  }
-  .result-category-text {
-    font-size: clamp(9.5px, 1.3vw, 15px);
-    white-space: nowrap !important;
-  }
+  .result-time-num,
+  .result-time-unit,
+  .result-category-text,
   .result-predicate-text {
-    font-size: clamp(8.5px, 1.1vw, 13px);
-    white-space: nowrap !important;
+    line-height: 1 !important;
   }
   .result-wood-actions {
     top: 84.0% !important;
     left: 53.5% !important;
     transform: translateX(-50%) !important;
-    gap: 6px !important;
+    gap: clamp(4px, 1.0vw, 8px) !important;
+    max-width: 96% !important;
   }
   .wood-action-btn {
-    padding: 5px 10px 5px 6px !important;
-    font-size: clamp(9.5px, 1.0vw, 12px) !important;
+    padding: 4px 10px 4px 6px !important;
+    font-size: clamp(9px, calc(var(--game-ch, 720px) * 0.021), 13px) !important;
     border-width: 2px !important;
   }
   .wood-icon-bubble {
-    width: 22px !important;
-    height: 22px !important;
-    font-size: 12px !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 11px !important;
   }
 }
 
@@ -1201,48 +1187,27 @@ body.fullscreen-simulated {
   .result-player-title {
     gap: 4px;
   }
-  .title-prefix {
-    font-size: clamp(9px, 2.2vw, 13px);
-  }
-  .title-name {
-    font-size: clamp(13px, 3.4vw, 18px);
-    letter-spacing: 0.8px;
-  }
   .result-card-banner {
-    font-size: clamp(6.5px, 1.6vw, 9.5px);
     white-space: nowrap !important;
     line-height: 1 !important;
   }
-  .result-time-num {
-    font-size: clamp(10px, 2.5vw, 15px);
-    line-height: 1;
-  }
-  .result-time-unit {
-    font-size: clamp(5.5px, 1.3vw, 7.5px);
-    line-height: 1;
-    margin-top: 1px;
-  }
-  .result-category-text {
-    font-size: clamp(7px, 1.8vw, 10.5px);
-    white-space: nowrap !important;
-    line-height: 1;
-  }
+  .result-time-num,
+  .result-time-unit,
+  .result-category-text,
   .result-predicate-text {
-    font-size: clamp(6px, 1.55vw, 9.5px);
-    white-space: nowrap !important;
-    line-height: 1;
+    line-height: 1 !important;
   }
   .result-wood-actions {
     top: 84.5% !important;
     left: 53.5% !important;
     transform: translateX(-50%) !important;
-    gap: 3px !important;
+    gap: 4px !important;
     width: max-content !important;
     max-width: 98% !important;
   }
   .wood-action-btn {
-    padding: 3px 6px 3px 4px !important;
-    font-size: clamp(7.5px, 1.8vw, 10px) !important;
+    padding: 3px 7px 3px 4px !important;
+    font-size: clamp(8px, calc(var(--game-ch, 720px) * 0.020), 11px) !important;
     border-width: 1.5px !important;
     gap: 3px !important;
   }
@@ -1252,6 +1217,7 @@ body.fullscreen-simulated {
     font-size: 9px !important;
     border-width: 1px !important;
   }
+}
   .wood-text {
     white-space: nowrap !important;
   }
@@ -1402,7 +1368,7 @@ body.fullscreen-simulated {
 .c2-input-name {
   font-family: var(--font-game), cursive, sans-serif !important;
   font-weight: 800 !important;
-  font-size: clamp(24px, 3.2vw, 44px) !important;
+  font-size: clamp(28px, 3.8vw, 52px) !important;
   color: #3a1c07 !important;
   caret-color: #8b5a2b !important;
   letter-spacing: 1.5px !important;
@@ -1410,8 +1376,42 @@ body.fullscreen-simulated {
 
 @media (max-width: 600px), (orientation: portrait) {
   .c2-input-name {
-    font-size: clamp(18px, 4.2vw, 24px) !important;
+    font-size: clamp(22px, 5.0vw, 30px) !important;
   }
+}
+
+/* Leaderboard Clear History Button & Row */
+.lb-clear-row {
+  margin-top: 24px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-clear-history {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.35) !important;
+  border-radius: 999px !important;
+  padding: 8px 22px !important;
+  color: #fca5a5 !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s var(--ease-spring) !important;
+  font-family: var(--font-game) !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.btn-clear-history:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4) !important;
 }
 
 .modal-header {

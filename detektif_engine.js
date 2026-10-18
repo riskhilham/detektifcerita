@@ -871,12 +871,12 @@
           input.style.setProperty('letter-spacing', '1.5px', 'important');
 
           if (isMobile) {
-            input.style.setProperty('font-size', 'clamp(18px, 4.2vw, 24px)', 'important');
+            input.style.setProperty('font-size', 'clamp(22px, 5.0vw, 30px)', 'important');
             input.style.setProperty('padding', '2px 10px 2px 12px', 'important');
             input.style.setProperty('line-height', 'normal', 'important');
           } else {
-            input.style.setProperty('font-size', 'clamp(24px, 3.2vw, 44px)', 'important');
-            input.style.setProperty('padding', '4px 16px 4px clamp(14px, 1.8vw, 24px)', 'important');
+            input.style.setProperty('font-size', 'clamp(28px, 3.8vw, 52px)', 'important');
+            input.style.setProperty('padding', '4px 18px 4px clamp(16px, 2.0vw, 28px)', 'important');
           }
 
           input.focus();
@@ -1218,6 +1218,18 @@
 
       container.appendChild(overlay);
 
+      // Dynamically compute canvas dimensions for proportional scaling
+      var updateOverlayDims = function () {
+        if (!container || !overlay) return;
+        var ch = container.offsetHeight || window.innerHeight;
+        var cw = container.offsetWidth || window.innerWidth;
+        overlay.style.setProperty('--game-ch', ch + 'px');
+        overlay.style.setProperty('--game-cw', cw + 'px');
+      };
+      updateOverlayDims();
+      window.addEventListener('resize', updateOverlayDims);
+      this._endOverlayResizeListener = updateOverlayDims;
+
       // Bind button events
       var self = this;
       document.getElementById('btn-show-leaderboard').onclick = function () {
@@ -1240,6 +1252,10 @@
     },
 
     removeHasilAkhirOverlay: function () {
+      if (this._endOverlayResizeListener) {
+        window.removeEventListener('resize', this._endOverlayResizeListener);
+        this._endOverlayResizeListener = null;
+      }
       var old = document.getElementById('hasil-akhir-overlay');
       if (old && old.parentNode) {
         old.parentNode.removeChild(old);
@@ -1335,16 +1351,22 @@
 
       var btnFs = document.getElementById('hud-btn-fs');
       if (btnFs) {
+        var fsClickLock = false;
         var triggerFs = function (e) {
           if (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if (e.stopPropagation) e.stopPropagation();
+            if (e.preventDefault && e.type !== 'touchstart') e.preventDefault();
           }
+          if (fsClickLock) return;
+          fsClickLock = true;
+          setTimeout(function () { fsClickLock = false; }, 400);
           self.playSound('click');
           self.toggleFullscreen();
         };
         btnFs.onclick = triggerFs;
         btnFs.addEventListener('touchend', triggerFs, { passive: false });
+        btnFs.addEventListener('pointerdown', function (e) { if (e && e.stopPropagation) e.stopPropagation(); });
+        btnFs.addEventListener('touchstart', function (e) { if (e && e.stopPropagation) e.stopPropagation(); });
       }
 
       this.updateHUDPlayer();
@@ -1372,6 +1394,20 @@
         }
       };
 
+      var triggerRuntimeResize = function () {
+        if (rt && rt.setSize) {
+          rt.fullscreen_mode = 4;
+          rt.fullscreen_scaling = 4;
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          rt.setSize(w, h, true);
+          setTimeout(function () { if (rt && rt.setSize) rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
+          setTimeout(function () { if (rt && rt.setSize) rt.setSize(window.innerWidth, window.innerHeight, true); }, 220);
+          setTimeout(function () { if (rt && rt.setSize) rt.setSize(window.innerWidth, window.innerHeight, true); }, 450);
+        }
+        if (self.updateHUDLayout) self.updateHUDLayout();
+      };
+
       if (!isFs && !isSimulated) {
         var el = document.documentElement || document.body;
         var rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
@@ -1383,12 +1419,7 @@
               handled = true;
               promise.then(function () {
                 updateFsIcon(true);
-                if (rt && rt.setSize) {
-                  rt.fullscreen_mode = 4;
-                  rt.fullscreen_scaling = 4;
-                  setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
-                  setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 250);
-                }
+                triggerRuntimeResize();
               }).catch(function (err) {
                 console.warn('Native fullscreen rejected, using fallback:', err);
                 self.toggleSimulatedFullscreen(true);
@@ -1397,12 +1428,7 @@
             } else {
               handled = true;
               updateFsIcon(true);
-              if (rt && rt.setSize) {
-                rt.fullscreen_mode = 4;
-                rt.fullscreen_scaling = 4;
-                setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
-                setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 250);
-              }
+              triggerRuntimeResize();
             }
           } catch (e) {
             console.warn('Native requestFullscreen failed:', e);
@@ -1421,15 +1447,11 @@
               if (exitPromise && typeof exitPromise.then === 'function') {
                 exitPromise.then(function () {
                   updateFsIcon(false);
-                  if (rt && rt.setSize) {
-                    setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
-                  }
+                  triggerRuntimeResize();
                 }).catch(function () {});
               } else {
                 updateFsIcon(false);
-                if (rt && rt.setSize) {
-                  setTimeout(function () { rt.setSize(window.innerWidth, window.innerHeight, true); }, 80);
-                }
+                triggerRuntimeResize();
               }
             } catch (e) {}
           }
@@ -1667,9 +1689,9 @@
       html += '</div>';
 
       html +=
-        '<div style="margin-top:20px;text-align:center;">' +
-          '<button id="btn-clear-lb" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline;">' +
-            'Hapus Riwayat' +
+        '<div class="lb-clear-row">' +
+          '<button id="btn-clear-lb" class="btn-clear-history">' +
+            '🗑️ Hapus Riwayat Detektif' +
           '</button>' +
         '</div>';
 
@@ -1678,7 +1700,7 @@
       var self = this;
       var clearBtn = document.getElementById('btn-clear-lb');
       if (clearBtn) {
-        clearBtn.onclick = function (e) {
+        var onClearClick = function (e) {
           if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1686,6 +1708,8 @@
           self.playSound('click');
           self.showClearConfirmDialog();
         };
+        clearBtn.onclick = onClearClick;
+        clearBtn.addEventListener('touchend', onClearClick, { passive: false });
       }
     },
 
@@ -1698,7 +1722,8 @@
 
       var modal = document.createElement('div');
       modal.id = 'confirm-clear-modal';
-      modal.className = 'detective-modal-backdrop confirm-clear-backdrop';
+      modal.className = 'detective-modal-backdrop confirm-clear-backdrop active';
+      modal.style.display = 'flex';
       modal.innerHTML =
         '<div class="detective-modal-card confirm-modal-card">' +
           '<div class="confirm-modal-icon">⚠️</div>' +
@@ -1714,37 +1739,50 @@
 
       var closeModal = function () {
         modal.classList.remove('active');
+        modal.style.display = 'none';
         setTimeout(function () {
           if (modal.parentNode) modal.parentNode.removeChild(modal);
         }, 220);
       };
 
-      document.getElementById('btn-cancel-clear').onclick = function (e) {
-        if (e) e.preventDefault();
-        self.playSound('click');
-        closeModal();
-      };
+      var btnCancel = document.getElementById('btn-cancel-clear');
+      if (btnCancel) {
+        var onCancel = function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          self.playSound('click');
+          closeModal();
+        };
+        btnCancel.onclick = onCancel;
+        btnCancel.addEventListener('touchend', onCancel, { passive: false });
+      }
 
-      document.getElementById('btn-action-clear').onclick = function (e) {
-        if (e) e.preventDefault();
-        self.playSound('success');
-        self.history = [];
-        try {
-          localStorage.removeItem('detektif_cerita_history');
-        } catch (err) {}
-        closeModal();
-        self.renderLeaderboard();
-      };
+      var btnAction = document.getElementById('btn-action-clear');
+      if (btnAction) {
+        var onAction = function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          self.playSound('success');
+          self.history = [];
+          try {
+            localStorage.removeItem('detektif_cerita_history');
+          } catch (err) {}
+          closeModal();
+          self.renderLeaderboard();
+        };
+        btnAction.onclick = onAction;
+        btnAction.addEventListener('touchend', onAction, { passive: false });
+      }
 
       modal.onclick = function (e) {
         if (e.target === modal) {
           closeModal();
         }
       };
-
-      setTimeout(function () {
-        modal.classList.add('active');
-      }, 10);
     },
 
     renderCertificate: function () {
