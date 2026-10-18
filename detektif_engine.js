@@ -91,9 +91,9 @@
         var s = this.sounds[type];
         if (s) {
           s.currentTime = 0;
-          s.play().catch(function () {});
+          s.play().catch(function () { });
         }
-      } catch (e) {}
+      } catch (e) { }
     },
 
     // =========================================================================
@@ -116,7 +116,7 @@
 
       if (this.misiBgm.paused) {
         var p = this.misiBgm.play();
-        if (p && p.catch) p.catch(function () {});
+        if (p && p.catch) p.catch(function () { });
       }
     },
 
@@ -126,7 +126,7 @@
         try {
           this.misiBgm.pause();
           this.misiBgm.currentTime = 0;
-        } catch (e) {}
+        } catch (e) { }
       }
     },
 
@@ -143,11 +143,11 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
       var allAudios = document.querySelectorAll('audio');
       for (var a = 0; a < allAudios.length; a++) {
         if (allAudios[a] !== this.misiBgm && allAudios[a].src && allAudios[a].src.indexOf('fix,bgm') !== -1) {
-          try { allAudios[a].pause(); } catch (e) {}
+          try { allAudios[a].pause(); } catch (e) { }
         }
       }
     },
@@ -167,7 +167,7 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     },
 
     syncBgmVolume: function () {
@@ -206,7 +206,7 @@
         if (record.totalSeconds < currentBest) {
           localStorage.setItem('WaktuTerbaik', record.totalSeconds.toString());
         }
-      } catch (e) {}
+      } catch (e) { }
     },
 
     // Timer management
@@ -428,7 +428,7 @@
             };
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       proto.doChangeLayout = function (changeToLayout) {
         var fromLayout = this.running_layout ? this.running_layout.name : '';
@@ -454,7 +454,7 @@
           self.setC2Var('namapemain', nameVal);
           try {
             localStorage.setItem('NamaPemain', nameVal);
-          } catch (e) {}
+          } catch (e) { }
           self.resetAllMissionProgress();
           self.startTimer();
           self.updateHUDPlayer();
@@ -508,7 +508,7 @@
             };
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       // Hook C2 TextBox plugin to prevent C2 from overriding responsive font sizes with giant em values
       try {
@@ -523,7 +523,7 @@
             };
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
 
 
@@ -553,7 +553,7 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     },
 
     // Screen change handling
@@ -582,7 +582,7 @@
               }
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (this.updateHUDLayout) this.updateHUDLayout();
@@ -596,17 +596,17 @@
         actionsHud = document.getElementById('game-hud-actions');
       }
 
-      var isGameplay = (layoutName.indexOf('misi ') === 0 || 
-                        layoutName.indexOf('jawaban pg') === 0 || 
-                        layoutName.indexOf('pilihan ganda') === 0 ||
-                        layoutName.indexOf('feedback') === 0);
+      var isGameplay = (layoutName.indexOf('misi ') === 0 ||
+        layoutName.indexOf('jawaban pg') === 0 ||
+        layoutName.indexOf('pilihan ganda') === 0 ||
+        layoutName.indexOf('feedback') === 0);
       var isMainMenu = (layoutName === 'main menu' || layoutName === 'main menu 2');
       var isResults = (layoutName === 'hasil akhir');
       var isPetunjuk = (layoutName.indexOf('petunjuk') === 0);
-      var isHiddenScreen = (layoutName === 'loading' || 
-                            layoutName === 'loading+judul' || 
-                            layoutName === 'identitas pengguna' || 
-                            layoutName.indexOf('video') === 0);
+      var isHiddenScreen = (layoutName === 'loading' ||
+        layoutName === 'loading+judul' ||
+        layoutName === 'identitas pengguna' ||
+        layoutName.indexOf('video') === 0);
 
       // 3. Audio Router: Mission BGM ('media/bgm_misi.ogg') vs Default Menu BGM
       if (isGameplay) {
@@ -737,11 +737,11 @@
                 }
               }
             }
-          } catch (e) {}
+          } catch (e) { }
 
           var isMobile = (window.innerWidth <= 600) || (window.innerHeight > window.innerWidth);
           input.value = '';
-          input.setAttribute('placeholder', isMobile ? 'Ketik nama detektif...' : 'Ketik nama detektif...');
+          input.setAttribute('placeholder', isMobile ? 'Ketik nama...' : 'Ketik nama...');
           input.setAttribute('maxlength', '20');
           input.setAttribute('autocomplete', 'off');
           input.setAttribute('spellcheck', 'false');
@@ -865,19 +865,19 @@
       modal.style.display = 'none';
       modal.innerHTML =
         '<div class="game-alert-modal-card" id="game-alert-card">' +
-          '<button class="alert-modal-close" id="btn-close-alert" title="Tutup">✕</button>' +
-          '<div class="alert-modal-badge-wrapper">' +
-            '<div class="alert-modal-badge" id="alert-modal-icon">🦊🔎</div>' +
-          '</div>' +
-          '<h3 class="alert-modal-title" id="alert-modal-title">Perhatian Detektif!</h3>' +
-          '<div class="alert-modal-divider"></div>' +
-          '<div class="alert-modal-content" id="alert-modal-content"></div>' +
-          '<div class="alert-modal-footer">' +
-            '<button class="wood-action-btn alert-modal-btn" id="btn-ok-alert">' +
-              '<span class="wood-icon-bubble">👍</span>' +
-              '<span class="wood-text" id="alert-modal-btn-text">Siap, Lanjutkan!</span>' +
-            '</button>' +
-          '</div>' +
+        '<button class="alert-modal-close" id="btn-close-alert" title="Tutup">✕</button>' +
+        '<div class="alert-modal-badge-wrapper">' +
+        '<div class="alert-modal-badge" id="alert-modal-icon">🦊🔎</div>' +
+        '</div>' +
+        '<h3 class="alert-modal-title" id="alert-modal-title">Perhatian Detektif!</h3>' +
+        '<div class="alert-modal-divider"></div>' +
+        '<div class="alert-modal-content" id="alert-modal-content"></div>' +
+        '<div class="alert-modal-footer">' +
+        '<button class="wood-action-btn alert-modal-btn" id="btn-ok-alert">' +
+        '<span class="wood-icon-bubble">👍</span>' +
+        '<span class="wood-text" id="alert-modal-btn-text">Siap, Lanjutkan!</span>' +
+        '</button>' +
+        '</div>' +
         '</div>';
 
       document.body.appendChild(modal);
@@ -949,7 +949,7 @@
         icon: '🧩🔍',
         title: 'Teka-teki Belum Selesai!',
         body: '<div class="alert-highlight">Masih tersisa <strong>' + sisa + ' potongan lagi</strong> yang harus diletakkan!</div>' +
-              '<div class="alert-hint">Periksa kembali teks cerita, lalu pasangkan seluruh potongan watak, latar, atau amanat pada tempat yang tepat sebelum melanjutkan penyelidikan.</div>',
+          '<div class="alert-hint">Periksa kembali teks cerita, lalu pasangkan seluruh potongan watak, latar, atau amanat pada tempat yang tepat sebelum melanjutkan penyelidikan.</div>',
         btnText: 'Siap, Cari Lagi! 🔎',
         sound: 'warning',
         duration: 7000
@@ -961,7 +961,7 @@
         icon: '✍️🕵️',
         title: 'Nama Belum Diisi!',
         body: '<div class="alert-highlight">Masukkan nama detektif kamu terlebih dahulu (minimal 2 karakter)!</div>' +
-              '<div class="alert-hint">Nama detektif akan dicatatkan pada Buku Rekor dan Piagam Detektif resmi.</div>',
+          '<div class="alert-hint">Nama detektif akan dicatatkan pada Buku Rekor dan Piagam Detektif resmi.</div>',
         btnText: 'Ketik Nama ✏️',
         sound: 'warning',
         duration: 5000
@@ -1039,7 +1039,7 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       // Celebration Confetti!
       this.launchConfetti();
@@ -1061,49 +1061,49 @@
       overlay.innerHTML =
         // 1. Top Scalloped Box: Player Name (Large, Bold, Cartoon Font)
         '<div class="result-slot-name">' +
-          '<div class="result-player-title">' +
-            '<span class="title-prefix">DETEKTIF :</span>' +
-            '<span class="title-name">' + this.escapeHtml(record.name) + '</span>' +
-          '</div>' +
+        '<div class="result-player-title">' +
+        '<span class="title-prefix">DETEKTIF :</span>' +
+        '<span class="title-name">' + this.escapeHtml(record.name) + '</span>' +
+        '</div>' +
         '</div>' +
 
         // 2. Alarm Clock slot: Total Time Banner & Value
         '<div class="result-card-banner result-banner-clock">Total Waktu</div>' +
         '<div class="result-card-val result-val-clock">' +
-          '<div class="result-time-num">' + record.timeFormatted + '</div>' +
-          '<div class="result-time-unit">menit : detik</div>' +
+        '<div class="result-time-num">' + record.timeFormatted + '</div>' +
+        '<div class="result-time-unit">menit : detik</div>' +
         '</div>' +
 
         // 3. Speedometer slot: Time Category Banner & Value
         '<div class="result-card-banner result-banner-speedo">Kategori Waktu</div>' +
         '<div class="result-card-val result-val-speedo">' +
-          '<div class="result-category-text">' + record.category + '</div>' +
+        '<div class="result-category-text">' + record.category + '</div>' +
         '</div>' +
 
         // 4. Medal slot: Predicate Banner & Value
         '<div class="result-card-banner result-banner-medal">Predikat</div>' +
         '<div class="result-card-val result-val-medal">' +
-          '<div class="result-predicate-text">' + record.predTitle + '</div>' +
+        '<div class="result-predicate-text">' + record.predTitle + '</div>' +
         '</div>' +
 
         // 5. Wooden Action Buttons at Bottom (4 Full-Sized Thematic Wooden Buttons)
         '<div class="result-wood-actions">' +
-          '<button class="wood-action-btn wood-btn-restart" id="btn-restart-game">' +
-            '<span class="wood-icon-bubble">↻</span>' +
-            '<span class="wood-text">Mulai Ulang</span>' +
-          '</button>' +
-          '<button class="wood-action-btn wood-btn-home" id="btn-main-menu">' +
-            '<span class="wood-icon-bubble">🏠</span>' +
-            '<span class="wood-text">Beranda</span>' +
-          '</button>' +
-          '<button class="wood-action-btn wood-btn-leaderboard" id="btn-show-leaderboard">' +
-            '<span class="wood-icon-bubble">🏆</span>' +
-            '<span class="wood-text">Papan Skor</span>' +
-          '</button>' +
-          '<button class="wood-action-btn wood-btn-cert" id="btn-show-certificate">' +
-            '<span class="wood-icon-bubble">📜</span>' +
-            '<span class="wood-text">Piagam</span>' +
-          '</button>' +
+        '<button class="wood-action-btn wood-btn-restart" id="btn-restart-game">' +
+        '<span class="wood-icon-bubble">↻</span>' +
+        '<span class="wood-text">Mulai Ulang</span>' +
+        '</button>' +
+        '<button class="wood-action-btn wood-btn-home" id="btn-main-menu">' +
+        '<span class="wood-icon-bubble">🏠</span>' +
+        '<span class="wood-text">Beranda</span>' +
+        '</button>' +
+        '<button class="wood-action-btn wood-btn-leaderboard" id="btn-show-leaderboard">' +
+        '<span class="wood-icon-bubble">🏆</span>' +
+        '<span class="wood-text">Papan Skor</span>' +
+        '</button>' +
+        '<button class="wood-action-btn wood-btn-cert" id="btn-show-certificate">' +
+        '<span class="wood-icon-bubble">📜</span>' +
+        '<span class="wood-text">Piagam</span>' +
+        '</button>' +
         '</div>';
 
       container.appendChild(overlay);
@@ -1202,11 +1202,11 @@
       playerHud.style.display = 'none';
       playerHud.innerHTML =
         '<div class="hud-wood-badge hud-player-pill" id="hud-player-pill">' +
-          '<div class="hud-badge-avatar">🦊</div>' +
-          '<div class="hud-badge-info">' +
-            '<span class="hud-badge-label">DETEKTIF</span>' +
-            '<span class="hud-badge-name" id="hud-player-name">PEMAIN</span>' +
-          '</div>' +
+        '<div class="hud-badge-avatar">🦊</div>' +
+        '<div class="hud-badge-info">' +
+        '<span class="hud-badge-label">DETEKTIF</span>' +
+        '<span class="hud-badge-name" id="hud-player-name">PEMAIN</span>' +
+        '</div>' +
         '</div>';
       container.appendChild(playerHud);
 
@@ -1217,11 +1217,11 @@
       actionsHud.style.display = 'none';
       actionsHud.innerHTML =
         '<button class="hud-wood-btn hud-btn-rekor" id="hud-btn-lb" title="Papan Skor & Rekor Permainan">' +
-          '<span class="hud-icon-bubble">🏆</span>' +
-          '<span class="hud-btn-text">Papan Skor</span>' +
+        '<span class="hud-icon-bubble">🏆</span>' +
+        '<span class="hud-btn-text">Papan Skor</span>' +
         '</button>' +
         '<button class="hud-wood-btn hud-btn-fs" id="hud-btn-fs" title="Layar Penuh">' +
-          '<span class="hud-fs-icon">⛶</span>' +
+        '<span class="hud-fs-icon">⛶</span>' +
         '</button>';
       container.appendChild(actionsHud);
 
@@ -1338,12 +1338,12 @@
                 exitPromise.then(function () {
                   updateFsIcon(false);
                   triggerRuntimeResize();
-                }).catch(function () {});
+                }).catch(function () { });
               } else {
                 updateFsIcon(false);
                 triggerRuntimeResize();
               }
-            } catch (e) {}
+            } catch (e) { }
           }
         }
         if (isSimulated) {
@@ -1457,11 +1457,11 @@
       lbModal.style.display = 'none';
       lbModal.innerHTML =
         '<div class="detective-modal-card">' +
-          '<div class="modal-header">' +
-            '<h2 class="modal-title">🏆 Papan Skor & Riwayat Detektif</h2>' +
-            '<button class="modal-close-btn" data-close="leaderboard-modal">✕</button>' +
-          '</div>' +
-          '<div class="modal-body" id="leaderboard-body"></div>' +
+        '<div class="modal-header">' +
+        '<h2 class="modal-title">🏆 Papan Skor & Riwayat Detektif</h2>' +
+        '<button class="modal-close-btn" data-close="leaderboard-modal">✕</button>' +
+        '</div>' +
+        '<div class="modal-body" id="leaderboard-body"></div>' +
         '</div>';
       document.body.appendChild(lbModal);
 
@@ -1472,14 +1472,14 @@
       certModal.style.display = 'none';
       certModal.innerHTML =
         '<div class="detective-modal-card">' +
-          '<div class="modal-header">' +
-            '<h2 class="modal-title">📜 Piagam Lencana Detektif</h2>' +
-            '<div style="display:flex;gap:8px;">' +
-              '<button class="corner-btn" id="btn-print-cert" title="Cetak Piagam Ukuran A4 Landscape" style="width:auto;border-radius:999px;padding:0 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;">🖨️ Cetak Piagam (A4 Landscape)</button>' +
-              '<button class="modal-close-btn" data-close="certificate-modal">✕</button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="modal-body" id="certificate-body"></div>' +
+        '<div class="modal-header">' +
+        '<h2 class="modal-title">📜 Piagam Lencana Detektif</h2>' +
+        '<div style="display:flex;gap:8px;">' +
+        '<button class="corner-btn" id="btn-print-cert" title="Cetak Piagam Ukuran A4 Landscape" style="width:auto;border-radius:999px;padding:0 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;">🖨️ Cetak Piagam (A4 Landscape)</button>' +
+        '<button class="modal-close-btn" data-close="certificate-modal">✕</button>' +
+        '</div>' +
+        '</div>' +
+        '<div class="modal-body" id="certificate-body"></div>' +
         '</div>';
       document.body.appendChild(certModal);
 
@@ -1541,9 +1541,9 @@
       if (!this.history || this.history.length === 0) {
         body.innerHTML =
           '<div class="empty-state">' +
-            '<div class="empty-state-icon">🔍</div>' +
-            '<div style="font-size:18px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Belum Ada Riwayat Detektif</div>' +
-            '<div>Selesaikan seluruh 10 misi untuk mencatatkan rekor pertamamu!</div>' +
+          '<div class="empty-state-icon">🔍</div>' +
+          '<div style="font-size:18px;font-weight:700;color:#f8fafc;margin-bottom:6px;">Belum Ada Riwayat Detektif</div>' +
+          '<div>Selesaikan seluruh 10 misi untuk mencatatkan rekor pertamamu!</div>' +
           '</div>';
         return;
       }
@@ -1563,26 +1563,26 @@
 
         html +=
           '<div class="leaderboard-item ' + rankClass + '">' +
-            '<div class="lb-left">' +
-              '<div class="lb-rank">' + medal + '</div>' +
-              '<div>' +
-                '<div class="lb-name">' + DetectiveEngine.escapeHtml(item.name) + '</div>' +
-                '<div class="lb-meta">' + item.dateStr + ' • ' + (item.predTitle || item.predicate) + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="lb-right">' +
-              '<div class="lb-time">' + item.timeFormatted + '</div>' +
-              '<div class="lb-badge">' + item.category + '</div>' +
-            '</div>' +
+          '<div class="lb-left">' +
+          '<div class="lb-rank">' + medal + '</div>' +
+          '<div>' +
+          '<div class="lb-name">' + DetectiveEngine.escapeHtml(item.name) + '</div>' +
+          '<div class="lb-meta">' + item.dateStr + ' • ' + (item.predTitle || item.predicate) + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="lb-right">' +
+          '<div class="lb-time">' + item.timeFormatted + '</div>' +
+          '<div class="lb-badge">' + item.category + '</div>' +
+          '</div>' +
           '</div>';
       });
       html += '</div>';
 
       html +=
         '<div class="lb-clear-row">' +
-          '<button id="btn-clear-lb" class="btn-clear-history">' +
-            '🗑️ Hapus Riwayat Detektif' +
-          '</button>' +
+        '<button id="btn-clear-lb" class="btn-clear-history">' +
+        '🗑️ Hapus Riwayat Detektif' +
+        '</button>' +
         '</div>';
 
       body.innerHTML = html;
@@ -1616,13 +1616,13 @@
       modal.style.display = 'flex';
       modal.innerHTML =
         '<div class="detective-modal-card confirm-modal-card">' +
-          '<div class="confirm-modal-icon">⚠️</div>' +
-          '<h3 class="confirm-modal-title">Hapus Riwayat Detektif?</h3>' +
-          '<p class="confirm-modal-desc">Seluruh data riwayat permainan, rekor waktu, dan peringkat yang tersimpan akan dihapus secara permanen. Apakah kamu yakin?</p>' +
-          '<div class="confirm-modal-actions">' +
-            '<button class="confirm-btn confirm-btn-cancel" id="btn-cancel-clear">Batal</button>' +
-            '<button class="confirm-btn confirm-btn-danger" id="btn-action-clear">Ya, Hapus</button>' +
-          '</div>' +
+        '<div class="confirm-modal-icon">⚠️</div>' +
+        '<h3 class="confirm-modal-title">Hapus Riwayat Detektif?</h3>' +
+        '<p class="confirm-modal-desc">Seluruh data riwayat permainan, rekor waktu, dan peringkat yang tersimpan akan dihapus secara permanen. Apakah kamu yakin?</p>' +
+        '<div class="confirm-modal-actions">' +
+        '<button class="confirm-btn confirm-btn-cancel" id="btn-cancel-clear">Batal</button>' +
+        '<button class="confirm-btn confirm-btn-danger" id="btn-action-clear">Ya, Hapus</button>' +
+        '</div>' +
         '</div>';
 
       document.body.appendChild(modal);
@@ -1660,7 +1660,7 @@
           self.history = [];
           try {
             localStorage.removeItem('detektif_cerita_history');
-          } catch (err) {}
+          } catch (err) { }
           closeModal();
           self.renderLeaderboard();
         };
@@ -1705,81 +1705,81 @@
 
       body.innerHTML =
         '<div class="cert-card-a4" id="cert-printable-card">' +
-          '<div class="cert-corner-ornament cert-corner-tl">⚜️</div>' +
-          '<div class="cert-corner-ornament cert-corner-tr">⚜️</div>' +
-          '<div class="cert-corner-ornament cert-corner-bl">⚜️</div>' +
-          '<div class="cert-corner-ornament cert-corner-br">⚜️</div>' +
-          '<div class="cert-inner-frame">' +
-            '<div class="cert-gold-divider top-ornament">' +
-              '<span class="cert-divider-line"></span>' +
-              '<span class="cert-divider-diamond">⚜️ ◆ ✦ ◆ ⚜️</span>' +
-              '<span class="cert-divider-line"></span>' +
-            '</div>' +
-            '<div class="cert-main-title">PIAGAM PENGHARGAAN</div>' +
-            '<div class="cert-honor-title">LENCANA DETEKTIF SASTRA INDONESIA</div>' +
-            '<div class="cert-recipient-preamble">Diberikan secara resmi dan penuh kehormatan kepada:</div>' +
-            '<div class="cert-recipient-name">' + this.escapeHtml(res.name) + '</div>' +
-            '<div class="cert-name-underline"></div>' +
-            '<div class="cert-citation">' +
-              'Telah berhasil menuntaskan seluruh <strong>10 Misi Investigasi Kasus Detektif Cerita</strong> dengan ketelitian analisa, penalaran deduktif yang tajam, serta pemahaman unsur intrinsik sastra yang unggul.' +
-            '</div>' +
-            '<div class="cert-matrix-row">' +
-              '<div class="cert-matrix-col">' +
-                '<div class="cert-plaque">' +
-                  '<div class="cert-plaque-icon">⏱️</div>' +
-                  '<div class="cert-plaque-label">WAKTU INVESTIGASI</div>' +
-                  '<div class="cert-plaque-val">' + res.timeFormatted + '</div>' +
-                  '<div class="cert-plaque-sub">' + res.timeText + '</div>' +
-                '</div>' +
-              '</div>' +
-              '<div class="cert-matrix-col">' +
-                '<div class="cert-plaque cert-plaque-speed">' +
-                  '<div class="cert-plaque-icon">⚡</div>' +
-                  '<div class="cert-plaque-label">KATEGORI WAKTU</div>' +
-                  '<div class="cert-plaque-val">' + res.category + '</div>' +
-                  '<div class="cert-plaque-sub">Investigasi Cekatan</div>' +
-                '</div>' +
-              '</div>' +
-              '<div class="cert-matrix-col">' +
-                '<div class="cert-plaque cert-plaque-pred">' +
-                  '<div class="cert-plaque-icon">🏅</div>' +
-                  '<div class="cert-plaque-label">PREDIKAT KELULUSAN</div>' +
-                  '<div class="cert-plaque-val">' + (res.predTitle || res.predicate) + '</div>' +
-                  '<div class="cert-plaque-sub">Kecakapan Sastra Unggul</div>' +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="cert-stars-row">' +
-              starsStr +
-            '</div>' +
-            '<div class="cert-footer-grid">' +
-              '<div class="cert-footer-col cert-foot-left">' +
-                '<div class="cert-foot-meta-title">INFORMASI KELULUSAN</div>' +
-                '<div class="cert-foot-date">Tanggal: <strong>' + res.dateStr + '</strong></div>' +
-                '<div class="cert-foot-reg">No. Reg: <strong>' + regCode + '</strong></div>' +
-                '<div class="cert-foot-inst">Media Pembelajaran: Detektif Cerita</div>' +
-              '</div>' +
-              '<div class="cert-footer-col cert-foot-center">' +
-                '<div class="cert-gold-seal">' +
-                  '<div class="cert-seal-outer">' +
-                    '<div class="cert-seal-inner">' +
-                      '<span class="cert-seal-star">★</span>' +
-                      '<span class="cert-seal-text">TERVERIFIKASI</span>' +
-                      '<span class="cert-seal-year">RESMI</span>' +
-                    '</div>' +
-                  '</div>' +
-                  '<div class="cert-ribbon-tail left"></div>' +
-                  '<div class="cert-ribbon-tail right"></div>' +
-                '</div>' +
-              '</div>' +
-              '<div class="cert-footer-col cert-foot-right">' +
-                '<div class="cert-foot-status-badge">✓ TERVERIFIKASI & SAH</div>' +
-                '<div class="cert-foot-sign-role">Tim Validasi & Pengembang Media</div>' +
-                '<div class="cert-foot-sign-org">Media Detektif Cerita Interaktif</div>' +
-                '<div class="cert-foot-hash">KODE: ' + verifyCode + '</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
+        '<div class="cert-corner-ornament cert-corner-tl">⚜️</div>' +
+        '<div class="cert-corner-ornament cert-corner-tr">⚜️</div>' +
+        '<div class="cert-corner-ornament cert-corner-bl">⚜️</div>' +
+        '<div class="cert-corner-ornament cert-corner-br">⚜️</div>' +
+        '<div class="cert-inner-frame">' +
+        '<div class="cert-gold-divider top-ornament">' +
+        '<span class="cert-divider-line"></span>' +
+        '<span class="cert-divider-diamond">⚜️ ◆ ✦ ◆ ⚜️</span>' +
+        '<span class="cert-divider-line"></span>' +
+        '</div>' +
+        '<div class="cert-main-title">PIAGAM PENGHARGAAN</div>' +
+        '<div class="cert-honor-title">LENCANA DETEKTIF SASTRA INDONESIA</div>' +
+        '<div class="cert-recipient-preamble">Diberikan secara resmi dan penuh kehormatan kepada:</div>' +
+        '<div class="cert-recipient-name">' + this.escapeHtml(res.name) + '</div>' +
+        '<div class="cert-name-underline"></div>' +
+        '<div class="cert-citation">' +
+        'Telah berhasil menuntaskan seluruh <strong>10 Misi Investigasi Kasus Detektif Cerita</strong> dengan ketelitian analisa, penalaran deduktif yang tajam, serta pemahaman unsur intrinsik sastra yang unggul.' +
+        '</div>' +
+        '<div class="cert-matrix-row">' +
+        '<div class="cert-matrix-col">' +
+        '<div class="cert-plaque">' +
+        '<div class="cert-plaque-icon">⏱️</div>' +
+        '<div class="cert-plaque-label">WAKTU INVESTIGASI</div>' +
+        '<div class="cert-plaque-val">' + res.timeFormatted + '</div>' +
+        '<div class="cert-plaque-sub">' + res.timeText + '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="cert-matrix-col">' +
+        '<div class="cert-plaque cert-plaque-speed">' +
+        '<div class="cert-plaque-icon">⚡</div>' +
+        '<div class="cert-plaque-label">KATEGORI WAKTU</div>' +
+        '<div class="cert-plaque-val">' + res.category + '</div>' +
+        '<div class="cert-plaque-sub">Investigasi Cekatan</div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="cert-matrix-col">' +
+        '<div class="cert-plaque cert-plaque-pred">' +
+        '<div class="cert-plaque-icon">🏅</div>' +
+        '<div class="cert-plaque-label">PREDIKAT KELULUSAN</div>' +
+        '<div class="cert-plaque-val">' + (res.predTitle || res.predicate) + '</div>' +
+        '<div class="cert-plaque-sub">Kecakapan Sastra Unggul</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="cert-stars-row">' +
+        starsStr +
+        '</div>' +
+        '<div class="cert-footer-grid">' +
+        '<div class="cert-footer-col cert-foot-left">' +
+        '<div class="cert-foot-meta-title">INFORMASI KELULUSAN</div>' +
+        '<div class="cert-foot-date">Tanggal: <strong>' + res.dateStr + '</strong></div>' +
+        '<div class="cert-foot-reg">No. Reg: <strong>' + regCode + '</strong></div>' +
+        '<div class="cert-foot-inst">Media Pembelajaran: Detektif Cerita</div>' +
+        '</div>' +
+        '<div class="cert-footer-col cert-foot-center">' +
+        '<div class="cert-gold-seal">' +
+        '<div class="cert-seal-outer">' +
+        '<div class="cert-seal-inner">' +
+        '<span class="cert-seal-star">★</span>' +
+        '<span class="cert-seal-text">TERVERIFIKASI</span>' +
+        '<span class="cert-seal-year">RESMI</span>' +
+        '</div>' +
+        '</div>' +
+        '<div class="cert-ribbon-tail left"></div>' +
+        '<div class="cert-ribbon-tail right"></div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="cert-footer-col cert-foot-right">' +
+        '<div class="cert-foot-status-badge">✓ TERVERIFIKASI & SAH</div>' +
+        '<div class="cert-foot-sign-role">Tim Validasi & Pengembang Media</div>' +
+        '<div class="cert-foot-sign-org">Media Detektif Cerita Interaktif</div>' +
+        '<div class="cert-foot-hash">KODE: ' + verifyCode + '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
         '</div>';
     },
 
@@ -1933,7 +1933,7 @@
           try {
             localStorage.setItem('NamaPemain', self.playerName);
             localStorage.setItem('WaktuTerbaik', self.elapsedSeconds.toString());
-          } catch (e) {}
+          } catch (e) { }
 
           if (rt.running_layout.name !== 'hasil akhir') {
             rt.changelayout = null;
