@@ -162,12 +162,33 @@
             var t = rt.types_by_index[i];
             if (t && t.plugin && window.cr && window.cr.plugins_ && t.plugin instanceof window.cr.plugins_.Audio) {
               if (t.instances && t.instances[0]) {
-                window.cr.plugins_.Audio.prototype.acts.SetPaused.call(t.instances[0], "bgm", 1);
+                var audioInst = t.instances[0];
+                window.cr.plugins_.Audio.prototype.acts.SetPaused.call(audioInst, "bgm", 1);
+
+                var isPlaying = false;
+                if (window.cr.plugins_.Audio.prototype.cnds && window.cr.plugins_.Audio.prototype.cnds.IsTagPlaying) {
+                  isPlaying = window.cr.plugins_.Audio.prototype.cnds.IsTagPlaying.call(audioInst, "bgm");
+                }
+                if (!isPlaying && window.cr.plugins_.Audio.prototype.acts && window.cr.plugins_.Audio.prototype.acts.Play) {
+                  window.cr.plugins_.Audio.prototype.acts.Play.call(audioInst, ["fix,bgm", true], 1, 0, "bgm");
+                }
+                break;
               }
             }
           }
         }
       } catch (e) { }
+      var allAudios = document.querySelectorAll('audio');
+      for (var a = 0; a < allAudios.length; a++) {
+        if (allAudios[a] !== this.misiBgm && allAudios[a].src && allAudios[a].src.indexOf('fix,bgm') !== -1) {
+          try {
+            allAudios[a].muted = isMuted;
+            if (allAudios[a].paused && !isMuted) {
+              allAudios[a].play().catch(function () { });
+            }
+          } catch (e) { }
+        }
+      }
     },
 
     syncBgmVolume: function () {
@@ -608,15 +629,22 @@
         layoutName === 'identitas pengguna' ||
         layoutName.indexOf('video') === 0);
 
-      // 3. Audio Router: Mission BGM ('media/bgm_misi.ogg') vs Default Menu BGM
+      // 3. Audio Router: Mission BGM ('media/bgm_misi.ogg') vs Default Menu BGM ('fix,bgm')
       if (isGameplay) {
         this.playMisiBgm();
       } else {
         if (this.isMissionBgmPlaying) {
           this.stopMisiBgm();
         }
-        if (isMainMenu) {
+        var isVideo = (layoutName.indexOf('video') === 0);
+        if (!isVideo && layoutName !== 'loading') {
           this.resumeC2Bgm();
+          var self = this;
+          setTimeout(function () {
+            if (!self.isMissionBgmPlaying && self.currentLayoutName === layoutName) {
+              self.resumeC2Bgm();
+            }
+          }, 120);
         }
       }
 
