@@ -130,6 +130,15 @@
       }
     },
 
+    isMateriLayout: function (name) {
+      var lName = (name || this.currentLayoutName || '').toLowerCase();
+      return (lName.indexOf('audio pembelajaran') === 0 ||
+        lName.indexOf('video pembelajaran') === 0 ||
+        lName.indexOf('audio') === 0 ||
+        lName.indexOf('video') === 0 ||
+        lName.indexOf('materi') !== -1);
+    },
+
     stopC2Bgm: function () {
       try {
         var rt = window.cr_getC2Runtime ? window.cr_getC2Runtime() : null;
@@ -153,6 +162,7 @@
     },
 
     resumeC2Bgm: function () {
+      if (this.isMateriLayout()) return;
       var isMuted = (this.getC2Var('backsound') === 1);
       if (isMuted) return;
       try {
@@ -427,7 +437,7 @@
       rt.fullscreen_scaling = 4;
       var origDoChangeLayout = proto.doChangeLayout;
 
-      // Hook C2 Audio plugin to prevent C2 from playing default bgm during missions
+      // Hook C2 Audio plugin to prevent C2 from playing default bgm during missions or materi pages
       try {
         if (window.cr && window.cr.plugins_ && window.cr.plugins_.Audio) {
           var audioProto = window.cr.plugins_.Audio.prototype;
@@ -435,8 +445,8 @@
             audioProto.acts._detektifAudioHooked = true;
             var origPlay = audioProto.acts.Play;
             audioProto.acts.Play = function (file, looping, vol, tag) {
-              if (self.isMissionBgmPlaying && tag === 'bgm') {
-                return; // Suppress default menu BGM while on missions
+              if ((self.isMissionBgmPlaying || self.isMateriLayout()) && tag === 'bgm') {
+                return; // Suppress default menu BGM while on missions or materi pages
               }
               return origPlay.apply(this, arguments);
             };
@@ -621,6 +631,7 @@
         layoutName.indexOf('jawaban pg') === 0 ||
         layoutName.indexOf('pilihan ganda') === 0 ||
         layoutName.indexOf('feedback') === 0);
+      var isMateri = this.isMateriLayout(layoutName);
       var isMainMenu = (layoutName === 'main menu' || layoutName === 'main menu 2');
       var isResults = (layoutName === 'hasil akhir');
       var isPetunjuk = (layoutName.indexOf('petunjuk') === 0);
@@ -629,19 +640,29 @@
         layoutName === 'identitas pengguna' ||
         layoutName.indexOf('video') === 0);
 
-      // 3. Audio Router: Mission BGM ('media/bgm_misi.ogg') vs Default Menu BGM ('fix,bgm')
+      // 3. Audio Router: Mission BGM ('media/bgm_misi.ogg') vs Materi (Muted) vs Default Menu BGM ('fix,bgm')
       if (isGameplay) {
         this.playMisiBgm();
+      } else if (isMateri) {
+        if (this.isMissionBgmPlaying) {
+          this.stopMisiBgm();
+        }
+        this.stopC2Bgm();
+        var self = this;
+        setTimeout(function () {
+          if (self.isMateriLayout(self.currentLayoutName)) {
+            self.stopC2Bgm();
+          }
+        }, 120);
       } else {
         if (this.isMissionBgmPlaying) {
           this.stopMisiBgm();
         }
-        var isVideo = (layoutName.indexOf('video') === 0);
-        if (!isVideo && layoutName !== 'loading') {
+        if (layoutName !== 'loading') {
           this.resumeC2Bgm();
           var self = this;
           setTimeout(function () {
-            if (!self.isMissionBgmPlaying && self.currentLayoutName === layoutName) {
+            if (!self.isMissionBgmPlaying && !self.isMateriLayout(self.currentLayoutName) && self.currentLayoutName === layoutName) {
               self.resumeC2Bgm();
             }
           }, 120);
